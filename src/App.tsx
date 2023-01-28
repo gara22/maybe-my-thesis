@@ -1,8 +1,15 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import { httpGet } from './utils/http'
 import classes from './app.module.scss'
 import Topbar from './components/Topbar/Topbar'
+
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+} from "react-router-dom";
+import "./index.css";
 
 
 function App() {
@@ -20,8 +27,8 @@ function App() {
     <>
       <Topbar />
       <main className={classes.container}>
-        asd
-    </main>
+        <Outlet />
+      </main>
     </>
   )
 }
