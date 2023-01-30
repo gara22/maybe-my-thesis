@@ -1,11 +1,20 @@
 import { Classroom } from "./Classroom";
 import { User } from "./User";
 
-export interface Booking {
+export interface BookingResponse {
   _id: string;
-  classroom: Pick<Classroom, '_id' | 'name'>
+  classroom_id: string;
   from: Date;
   to: Date;
-  bookedBy: User;
+  booked_by: Pick<User, '_id' | 'name'>;
+  description: string;
+}
+
+export interface Booking {
+  _id: string;
+  classroom: Classroom;
+  from: Date;
+  to: Date;
+  booked_by: Pick<User, '_id' | 'name'>;
   description: string;
 }

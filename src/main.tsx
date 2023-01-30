@@ -14,6 +14,7 @@ import { Admin } from './features/admin/Admin'
 import { Bookings } from './features/bookings/Bookings'
 import { Classrooms } from './features/classrooms/Classrooms'
 import { Start } from './features/start/Start'
+import { getFullBookings } from './features/bookings/utils'
 
 const router = createBrowserRouter([
   {
@@ -32,10 +33,16 @@ const router = createBrowserRouter([
       {
         path: "/bookings",
         element: <Bookings />,
+        loader: getFullBookings,
+        shouldRevalidate: () => {
+          return false
+        }
+
       },
       {
         path: "/admin",
         element: <Admin />,
+        // loader: () => getFullBookings()
       },
     ]
   },
