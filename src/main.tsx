@@ -12,9 +12,13 @@ import "./index.css";
 import ErrorPage from './components/ErrorPage/ErrorPage'
 import { Admin } from './features/admin/Admin'
 import { Bookings } from './features/bookings/Bookings'
-import { Classrooms } from './features/classrooms/Classrooms'
-import { Start } from './features/start/Start'
-import { getFullBookings } from './features/bookings/utils'
+import { Classrooms } from './features/classrooms/ClassroomList'
+import { Home } from './features/home/Home'
+import Topbar from './components/Topbar/Topbar'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import ClassroomShow from './features/classrooms/ClassroomShow'
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -24,19 +28,23 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Start />,
+        element: <Home />,
       },
       {
         path: "/classrooms",
         element: <Classrooms />,
       },
       {
+        path: "/classrooms/:id",
+        element: <ClassroomShow />,
+      },
+      {
         path: "/bookings",
         element: <Bookings />,
-        loader: getFullBookings,
-        shouldRevalidate: () => {
-          return false
-        }
+        // loader: getFullBookings,
+        // shouldRevalidate: () => {
+        //   return false
+        // }
 
       },
       {
@@ -50,6 +58,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ChakraProvider>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </ChakraProvider>
 )

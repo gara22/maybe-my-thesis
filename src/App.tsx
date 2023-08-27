@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { httpGet } from './utils/http'
 import Topbar from './components/Topbar/Topbar'
 
 import {

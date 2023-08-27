@@ -5,7 +5,6 @@ import {
   Box,
   Flex,
   Avatar,
-  Link,
   Button,
   Menu,
   MenuButton,
@@ -17,6 +16,7 @@ import {
   Stack,
   useColorMode,
   Center,
+  Link,
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
@@ -38,24 +38,25 @@ const NavLink = ({ children, to }: { children: ReactNode, to: string }) => (
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  // const { data: sessionData } = useSession();
+
   return (
 
-    <Box bg={useColorModeValue('gray.100', 'gray.700')} px={4} width="100%" shadow="md" zIndex={2} >
-      <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
+    <Box bg={useColorModeValue('gray.100', 'gray.700')} px={4} shadow="md" zIndex={2} width='100%' >
+      <Flex h={16} alignItems={'center'} justifyContent={'space-between'} maxWidth='1024px' margin={'auto'}>
         <Flex gap={10}>
           <NavLink to='/'>
             home
           </NavLink>
-          <NavLink to='classrooms'>
+          <NavLink to='/classrooms'>
             classrooms
           </NavLink>
-          <NavLink to='bookings'>
+          <NavLink to='/bookings'>
             bookings
           </NavLink>
-          <NavLink to='/admin'>
+          {/* <NavLink to='/admin'>
             admin
-          </NavLink>
+          </NavLink> */}
 
         </Flex>
         <Flex alignItems={'center'}>
@@ -64,7 +65,7 @@ export default function Nav() {
               {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             </Button>
 
-            <Menu>
+            {/* {sessionData?.user ? <Menu>
               <MenuButton
                 as={Button}
                 rounded={'full'}
@@ -73,7 +74,7 @@ export default function Nav() {
                 minW={0}>
                 <Avatar
                   size={'sm'}
-                  src={'https://avatars.dicebear.com/api/male/username.svg'}
+                  src={sessionData?.user.image ? sessionData.user.image : 'https://avatars.dicebear.com/api/male/username.svg'}
                 />
               </MenuButton>
               <MenuList alignItems={'center'}>
@@ -81,20 +82,22 @@ export default function Nav() {
                 <Center>
                   <Avatar
                     size={'2xl'}
-                    src={'https://avatars.dicebear.com/api/male/username.svg'}
+                    src={sessionData?.user.image ? sessionData.user.image : 'https://avatars.dicebear.com/api/male/username.svg'}
                   />
                 </Center>
                 <br />
                 <Center>
-                  <p>Username</p>
+                  <p>{sessionData.user?.name}</p>
                 </Center>
                 <br />
                 <MenuDivider />
                 <MenuItem>Your Servers</MenuItem>
                 <MenuItem>Account Settings</MenuItem>
-                <MenuItem>Logout</MenuItem>
+                <MenuItem onClick={() => void signOut()}>Logout</MenuItem>
               </MenuList>
-            </Menu>
+            </Menu> : */}
+            <Button onClick={() => null}>Log in</Button>
+            {/* } */}
           </Stack>
         </Flex>
       </Flex>
