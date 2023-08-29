@@ -19,3 +19,7 @@ export const START_HOUR = 8;
 export const END_HOUR = 20;
 export const LENGTH_OF_WEEK = 5;
 export const UTC_OFFSET = moment().utcOffset() / 60;
+
+
+//TODO: get userid from session
+export const USER_ID = 'clfpmmvmg0000un2o7wq3s4ms';

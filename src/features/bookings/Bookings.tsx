@@ -6,7 +6,9 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
 import CustomModal from '../../components/Modal/Modal';
 import { Booking, BookingWithAllData, Classroom } from '../../types/types';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
+import { USER_ID } from '../../utils/constants';
+import axios from 'axios';
 
 export const Bookings = () => {
 
@@ -23,9 +25,6 @@ export const Bookings = () => {
   // const bookings: BookingWithAllData[] = [];
   const classrooms: Classroom[] = []
 
-  //TODO: get userid from session
-  const userId = 'clfpmmvmg0000un2o7wq3s4ms';
-
   const getClassrooms = async (): Promise<{ classrooms: Classroom[] }> => {
     const res = await fetch("http://localhost:8080/classrooms");
     return res.json();
@@ -33,42 +32,41 @@ export const Bookings = () => {
 
 
   const getBookingsOfUser = async (): Promise<{ bookings: BookingWithAllData[] }> => {
-    const res = await fetch(`http://localhost:8080/bookings/user?userId=${userId}`);
+    const res = await fetch(`http://localhost:8080/bookings/user?userId=${USER_ID}`);
     return res.json();
   };
+  const { data, isLoading, refetch: refetchBookings } = useQuery('bookings', getBookingsOfUser);
+
+  const deleteBookingMutation = useMutation((bookingId: string) => {
+    const res = axios.delete(`http://localhost:8080/bookings/delete/${bookingId}`);
+    return res;
+  }, {
+    onSuccess: async () => {
+      toast({
+        title: 'Booking deleted.',
+        description: "Booking deleted successfully",
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      })
+      await refetchBookings();
+    },
+    onError: (err: Error) => {
+      toast({
+        title: err.message,
+        description: "Couldn't delete booking",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    },
+  });
 
 
 
 
-  //TODO: fetching runs unnecessarily when either creating or deleting
-  const { data, isLoading, refetch } = useQuery('bookings', getBookingsOfUser);
-  // const { data: classrooms = [] } = api.classroom.getAllClassrooms.useQuery();
-  // const { mutate: deleteBooking } = api.booking.deleteBooking.useMutation({
-  //   onSuccess: async () => {
-  //     toast({
-  //       title: 'Booking deleted.',
-  //       description: "Booking deleted successfully",
-  //       status: 'info',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     })
-  //     await refetch();
-  //   },
-  // });
 
-  // const { mutate: createBooking } = api.booking.createBooking.useMutation({
-  //   onSuccess: async () => {
-  //     toast({
-  //       title: 'Booking created.',
-  //       description: "Booking created successfully",
-  //       status: 'success',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     })
-  //     await refetch();
-  //   },
-  // });
-
+  //TODO: think about the option for creating bookings from here
   const onCreate = (data: BookingFormValues) => {
     onCloseCreate();
     const { description, classroomId, day, time } = data;
@@ -89,7 +87,7 @@ export const Bookings = () => {
 
   const onDelete = (id: string) => {
     onCloseDelete()
-    // deleteBooking(id);
+    deleteBookingMutation.mutate(id);
   }
 
   const bg = useColorModeValue('gray.200', 'gray.600');
@@ -100,7 +98,7 @@ export const Bookings = () => {
         <h1>
           my bookings
         </h1>
-        <Button onClick={onOpenCreate} width='2xs'>New Booking</Button>
+        {/* <Button onClick={onOpenCreate} width='2xs'>New Booking</Button> */}
         {isLoading ?
           <Spinner />
           :

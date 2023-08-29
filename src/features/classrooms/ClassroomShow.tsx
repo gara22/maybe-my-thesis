@@ -1,15 +1,18 @@
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { Box, Flex, Heading, Spinner, useDisclosure, useToast } from '@chakra-ui/react'
+import axios from 'axios';
 import moment from 'moment';
 import React, { useRef, useState } from 'react'
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
 import BookingForm, { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
 import { Calendar } from '../../components/Calendar/Calendar'
 import CustomModal from '../../components/Modal/Modal';
 import { Booking, BookingWithBooker, Classroom } from '../../types/types';
-import { LENGTH_OF_WEEK, UTC_OFFSET } from '../../utils/constants';
+import { LENGTH_OF_WEEK, USER_ID, UTC_OFFSET } from '../../utils/constants';
 import { addDays, getDays, subtractDays } from '../../utils/dates';
+
+type BookingParams = Pick<Booking, 'from' | 'to' | 'classroomId' | 'description' | 'bookerId'>;
 
 
 const ClassroomShow = () => {
@@ -33,7 +36,55 @@ const ClassroomShow = () => {
   const createBookingRef = useRef<SubmitHandle>(null);
   const editBookingRef = useRef<SubmitHandle>(null);
 
+  const createBookingMutation = useMutation((data: BookingParams) => {
+    const res = axios.post("http://localhost:8080/bookings/new", data);
+    return res;
+  }, {
+    onSuccess: async () => {
+      toast({
+        title: 'Booking created.',
+        description: "Booking created successfully",
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      })
+      await refetchBookings();
+    },
+    onError: (err: Error) => {
+      toast({
+        title: err.message,
+        description: "Couldn't create booking",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    },
+  });
 
+  const editBookingMutation = useMutation((data: Pick<Booking, 'id' | 'description'>) => {
+    const res = axios.put("http://localhost:8080/bookings/edit", data);
+    return res;
+  }, {
+    onSuccess: async () => {
+      toast({
+        title: 'Booking updated.',
+        description: "Booking updated successfully",
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      })
+      await refetchBookings();
+    },
+    onError: (err: Error) => {
+      toast({
+        title: err.message,
+        description: "Couldn't updated booking",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    },
+  });
 
   const getClassroomById = async (id: string): Promise<{ classroom: Classroom }> => {
     const res = await fetch(`http://localhost:8080/classrooms/${id}`);
@@ -47,35 +98,9 @@ const ClassroomShow = () => {
     return res.json();
   };
   const { data: classroomData, isLoading, refetch } = useQuery(['classroom', id], () => getClassroomById(id as string), { refetchOnWindowFocus: false });
-  const { data: bookingsData, isLoading: isBookingsLoading } = useQuery(['bookings', days], getBookings, { refetchOnWindowFocus: false });
+  const { data: bookingsData, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery(['bookings', days], getBookings, { refetchOnWindowFocus: false });
   const classroom = classroomData?.classroom;
   const bookings = bookingsData?.bookings;
-
-  // const { mutate: createBooking } = api.booking.createBooking.useMutation({
-  //   onSuccess: async () => {
-  //     toast({
-  //       title: 'Booking created.',
-  //       description: "Booking created successfully",
-  //       status: 'success',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     })
-  //     await refetchBookings();
-  //   },
-  // });
-
-  // const { mutate: updateBooking } = api.booking.editBooking.useMutation({
-  //   onSuccess: async () => {
-  //     toast({
-  //       title: 'Booking updated.',
-  //       description: "Booking updated successfully",
-  //       status: 'success',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     })
-  //     await refetchBookings();
-  //   },
-  // });
 
   const onCreate = (data: BookingFormValues) => {
     onCloseCreate();
@@ -89,9 +114,10 @@ const ClassroomShow = () => {
       to,
       classroomId,
       description: description || '',
+      bookerId: USER_ID,
     }
 
-    // createBooking(bookingData);
+    createBookingMutation.mutate(bookingData);
   }
 
   const onEdit = (data: BookingFormValues) => {
@@ -108,7 +134,7 @@ const ClassroomShow = () => {
       description: description || '',
     }
 
-    // updateBooking({ ...bookingData, id: selectedBookingId as string });
+    editBookingMutation.mutate({ ...bookingData, id: selectedBookingId as string })
   }
 
 
@@ -153,12 +179,12 @@ const ClassroomShow = () => {
           onSubmit={() => editBookingRef.current?._submit()}
           buttonLabel='Edit Booking'
         >
-          {/* <BookingForm onSubmit={onEdit}
+          <BookingForm onSubmit={onEdit}
             ref={editBookingRef}
             classrooms={[{ id: classroom?.id, name: classroom?.name }]}
             defaultValues={{ classroomId: classroom.id, date: selectedDate, description: bookings?.find(b => b.id === selectedBookingId)?.description || '' }}
             isEdit
-          /> */}
+          />
         </CustomModal>}
     </>
   )
