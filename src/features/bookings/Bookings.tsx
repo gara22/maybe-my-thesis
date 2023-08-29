@@ -35,9 +35,9 @@ export const Bookings = () => {
     const res = await fetch(`http://localhost:8080/bookings/user?userId=${USER_ID}`);
     return res.json();
   };
-  const { data, isLoading, refetch: refetchBookings } = useQuery('bookings', getBookingsOfUser);
+  const { data, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery('bookings', getBookingsOfUser);
 
-  const deleteBookingMutation = useMutation((bookingId: string) => {
+  const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutation((bookingId: string) => {
     const res = axios.delete(`http://localhost:8080/bookings/delete/${bookingId}`);
     return res;
   }, {
@@ -60,6 +60,9 @@ export const Bookings = () => {
         isClosable: true,
       })
     },
+    onSettled: () => {
+      onCloseDelete()
+    }
   });
 
 
@@ -86,8 +89,7 @@ export const Bookings = () => {
 
 
   const onDelete = (id: string) => {
-    onCloseDelete()
-    deleteBookingMutation.mutate(id);
+    deleteBooking(id);
   }
 
   const bg = useColorModeValue('gray.200', 'gray.600');
@@ -99,7 +101,7 @@ export const Bookings = () => {
           my bookings
         </h1>
         {/* <Button onClick={onOpenCreate} width='2xs'>New Booking</Button> */}
-        {isLoading ?
+        {isBookingsLoading ?
           <Spinner />
           :
           (data?.bookings.map(b => (
@@ -118,10 +120,10 @@ export const Bookings = () => {
           )))
         }
       </Stack>
-      <CustomModal title='Create Booking' isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createBookingRef.current?._submit()} >
+      {/* <CustomModal title='Create Booking' isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createBookingRef.current?._submit()} >
         <BookingForm onSubmit={onCreate} ref={createBookingRef} classrooms={classrooms.map(c => ({ id: c.id, name: c.name }))} />
-      </CustomModal>
-      <CustomModal title='Delete Booking' isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedBookingId(''); onCloseDelete() }} onSubmit={() => deleteBookingRef.current?._delete()}>
+      </CustomModal> */}
+      <CustomModal title='Delete Booking' isLoading={isDeleteLoading} isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedBookingId(''); onCloseDelete() }} onSubmit={() => deleteBookingRef.current?._delete()}>
         <DeleteBooking onDelete={onDelete} bookingId={selectedBookingId} ref={deleteBookingRef} />
       </CustomModal>
     </>

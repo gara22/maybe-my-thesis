@@ -29,7 +29,7 @@ export const Classrooms = () => {
     return res.json();
   };
 
-  const createClassroomMutation = useMutation((data: Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>) => {
+  const { mutate: createClassroom, isLoading: isCreateLoading } = useMutation((data: Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>) => {
     const res = axios.post("http://localhost:8080/classrooms/new", data);
     return res;
   }, {
@@ -52,9 +52,12 @@ export const Classrooms = () => {
         isClosable: true,
       })
     },
+    onSettled: () => {
+      onCloseCreate();
+    }
   });
 
-  const deleteClassroomMutation = useMutation((data: string) => {
+  const { mutate: deleteClassroom, isLoading: isDeleteLoading } = useMutation((data: string) => {
     const res = axios.delete(`http://localhost:8080/classrooms/delete/${data}`);
     return res;
   }, {
@@ -77,42 +80,21 @@ export const Classrooms = () => {
         isClosable: true,
       })
     },
+    onSettled: () => {
+      onCloseDelete();
+    }
   });
 
   //TODO: fetching runs unnecessarily when either creating or deleting
   const { data, isLoading, refetch } = useQuery('classrooms', getClassrooms);
-  // const { mutate: deleteClassroom } = api.classroom.deleteClassroom.useMutation({
-  //   onSuccess: async () => {
-  //     toast({
-  //       title: 'Classroom deleted.',
-  //       description: "Classroom deleted successfully",
-  //       status: 'info',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     })
-  //     await refetch();
-  //   },
-  //   onError: (err) => {
-  //     toast({
-  //       title: err.message,
-  //       description: "Couldn't delete classroom",
-  //       status: 'error',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     })
-  //   },
-  // });
 
   const onCreate = (data: Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>) => {
-    console.log(data)
-    onCloseCreate()
-    createClassroomMutation.mutate(data);
+    createClassroom(data);
   }
 
 
   const onDelete = (id: string) => {
-    onCloseDelete()
-    deleteClassroomMutation.mutate(id)
+    deleteClassroom(id)
   }
 
   const bg = useColorModeValue('gray.200', 'gray.600');
@@ -144,10 +126,10 @@ export const Classrooms = () => {
           )))
         }
       </Stack>
-      <CustomModal title='Create Classroom' isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createClassroomRef.current?._submit()} >
+      <CustomModal title='Create Classroom' isLoading={isCreateLoading} isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createClassroomRef.current?._submit()} >
         <ClassroomForm onSubmit={onCreate} ref={createClassroomRef} />
       </CustomModal>
-      <CustomModal title='Delete Classroom' isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedClassroomId(''); onCloseDelete() }} onSubmit={() => deleteClassroomRef.current?._delete()}>
+      <CustomModal title='Delete Classroom' isLoading={isDeleteLoading} isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedClassroomId(''); onCloseDelete() }} onSubmit={() => deleteClassroomRef.current?._delete()}>
         {/* TODO: make a general delete component */}
         <DeleteBooking onDelete={onDelete} bookingId={selectedClassroomId} ref={deleteClassroomRef} />
       </CustomModal>

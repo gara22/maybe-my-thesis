@@ -36,7 +36,7 @@ const ClassroomShow = () => {
   const createBookingRef = useRef<SubmitHandle>(null);
   const editBookingRef = useRef<SubmitHandle>(null);
 
-  const createBookingMutation = useMutation((data: BookingParams) => {
+  const { mutate: createBooking, isLoading: isCreateLoading } = useMutation((data: BookingParams) => {
     const res = axios.post("http://localhost:8080/bookings/new", data);
     return res;
   }, {
@@ -59,9 +59,12 @@ const ClassroomShow = () => {
         isClosable: true,
       })
     },
+    onSettled: () => {
+      onCloseCreate()
+    }
   });
 
-  const editBookingMutation = useMutation((data: Pick<Booking, 'id' | 'description'>) => {
+  const { mutate: editBooking, isLoading: editLoading } = useMutation((data: Pick<Booking, 'id' | 'description'>) => {
     const res = axios.put("http://localhost:8080/bookings/edit", data);
     return res;
   }, {
@@ -84,6 +87,9 @@ const ClassroomShow = () => {
         isClosable: true,
       })
     },
+    onSettled: () => {
+      onCloseEdit()
+    }
   });
 
   const getClassroomById = async (id: string): Promise<{ classroom: Classroom }> => {
@@ -103,7 +109,6 @@ const ClassroomShow = () => {
   const bookings = bookingsData?.bookings;
 
   const onCreate = (data: BookingFormValues) => {
-    onCloseCreate();
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
     const from = moment(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
@@ -117,11 +122,10 @@ const ClassroomShow = () => {
       bookerId: USER_ID,
     }
 
-    createBookingMutation.mutate(bookingData);
+    createBooking(bookingData);
   }
 
   const onEdit = (data: BookingFormValues) => {
-    onCloseEdit();
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
     const from = moment(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
@@ -134,7 +138,7 @@ const ClassroomShow = () => {
       description: description || '',
     }
 
-    editBookingMutation.mutate({ ...bookingData, id: selectedBookingId as string })
+    editBooking({ ...bookingData, id: selectedBookingId as string })
   }
 
 
@@ -164,6 +168,7 @@ const ClassroomShow = () => {
           onClose={onCloseCreate}
           onSubmit={() => createBookingRef.current?._submit()}
           buttonLabel='Create Booking'
+          isLoading={isCreateLoading}
         >
           <BookingForm onSubmit={onCreate}
             ref={createBookingRef}
@@ -178,6 +183,7 @@ const ClassroomShow = () => {
           onClose={onCloseEdit}
           onSubmit={() => editBookingRef.current?._submit()}
           buttonLabel='Edit Booking'
+          isLoading={editLoading}
         >
           <BookingForm onSubmit={onEdit}
             ref={editBookingRef}

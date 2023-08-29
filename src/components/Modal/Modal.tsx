@@ -21,9 +21,10 @@ export type ModalProps = {
   title: string;
   btnColor?: string;
   buttonLabel?: string;
+  isLoading?: boolean;
 } & PropsWithChildren
 
-export default function CustomModal({ isOpen, onOpen, onClose, children, title, onSubmit, isSubmittable = true, buttonLabel = 'Submit' }: ModalProps) {
+export default function CustomModal({ isOpen, isLoading = false, onClose, children, title, onSubmit, isSubmittable = true, buttonLabel = 'Submit' }: ModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset={'scale'}>
@@ -32,6 +33,7 @@ export default function CustomModal({ isOpen, onOpen, onClose, children, title, 
         <ModalHeader>{title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
+          {/* {isLoading ? <Spinner /> :  */}
           <Box
             rounded={'lg'}
             boxShadow={'lg'}
@@ -41,12 +43,12 @@ export default function CustomModal({ isOpen, onOpen, onClose, children, title, 
         </ModalBody>
 
         <ModalFooter>
-          <Button mr={3} type='submit' onClick={onSubmit} isDisabled={!isSubmittable}>
-            {buttonLabel}
-          </Button>
           <Button bg='red.400' _hover={{
             bg: 'red.700',
-          }} onClick={onClose} >Cancel</Button>
+          }} onClick={onClose} isDisabled={isLoading} >Cancel</Button>
+          <Button ml={3} type='submit' onClick={onSubmit} isLoading={isLoading} isDisabled={!isSubmittable}>
+            {buttonLabel}
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
