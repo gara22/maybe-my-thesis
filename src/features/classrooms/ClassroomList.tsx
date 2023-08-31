@@ -92,13 +92,11 @@ export const Classrooms = () => {
     createClassroom(data);
   }
 
-
   const onDelete = (id: string) => {
     deleteClassroom(id)
   }
 
   const bg = useColorModeValue('gray.200', 'gray.600');
-  console.log(data?.classrooms)
 
   return (
     <>
@@ -127,7 +125,7 @@ export const Classrooms = () => {
         }
       </Stack>
       <CustomModal title='Create Classroom' isLoading={isCreateLoading} isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createClassroomRef.current?._submit()} >
-        <ClassroomForm onSubmit={onCreate} ref={createClassroomRef} />
+        <ClassroomForm onSubmit={onCreate} ref={createClassroomRef} isLoading={isCreateLoading} />
       </CustomModal>
       <CustomModal title='Delete Classroom' isLoading={isDeleteLoading} isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedClassroomId(''); onCloseDelete() }} onSubmit={() => deleteClassroomRef.current?._delete()}>
         {/* TODO: make a general delete component */}

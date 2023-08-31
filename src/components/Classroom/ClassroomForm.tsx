@@ -25,10 +25,11 @@ export type SubmitFormType = {
 
 export type ClassroomFormProps = {
   onSubmit: (data: Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>) => void;
+  isLoading?: boolean;
 }
 
-export const ClassroomForm = forwardRef<SubmitFormType, ClassroomFormProps>(({ onSubmit }, ref) => {
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm<Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>>({
+export const ClassroomForm = forwardRef<SubmitFormType, ClassroomFormProps>(({ onSubmit, isLoading = false }, ref) => {
+  const { register, handleSubmit, formState: { errors } } = useForm<Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>>({
     resolver: zodResolver(schema),
     mode: 'onTouched',
   });
@@ -45,17 +46,17 @@ export const ClassroomForm = forwardRef<SubmitFormType, ClassroomFormProps>(({ o
 
     <form>
       <Stack spacing={6}>
-        <FormControl isInvalid={!!errors.name} id="name">
+        <FormControl isInvalid={!!errors.name} isDisabled={isLoading} id="name">
           <FormLabel>Name</FormLabel>
           <Input type="text" {...register('name')} />
           <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl isInvalid={!!errors.capacity} id="capacity">
+        <FormControl isInvalid={!!errors.capacity} isDisabled={isLoading} id="capacity">
           <FormLabel>Capacity</FormLabel>
           <Input type="number" {...register('capacity')} />
           {errors.capacity && <FormErrorMessage>{errors.capacity.message}</FormErrorMessage>}
         </FormControl>
-        <FormControl id="hasComputer">
+        <FormControl id="hasComputer" isDisabled={isLoading}>
           <FormLabel>Has computers?</FormLabel>
           <Switch id='email-alerts' {...register('hasComputer')} />
         </FormControl>

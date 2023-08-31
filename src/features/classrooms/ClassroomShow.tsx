@@ -148,6 +148,18 @@ const ClassroomShow = () => {
     bookingId ? onOpenEdit() : onOpenCreate();
   }
 
+  //TODO: Add delete functionality
+  const deleteButtonProps = {
+    bg: 'red.700 ',
+    color: 'grey.400',
+    title: 'Delete Booking',
+    onClick: () => console.log('delete'),
+    isDisabled: false,
+    _hover: {
+      bg: 'red.900',
+    },
+  }
+
   if (isLoading)
     return <Spinner />
 
@@ -174,6 +186,7 @@ const ClassroomShow = () => {
             ref={createBookingRef}
             classrooms={[{ id: classroom?.id, name: classroom?.name }]}
             defaultValues={{ classroomId: classroom.id, date: selectedDate, }}
+            isLoading={isCreateLoading}
           />
         </CustomModal>}
       {selectedDate && selectedBookingId &&
@@ -184,12 +197,14 @@ const ClassroomShow = () => {
           onSubmit={() => editBookingRef.current?._submit()}
           buttonLabel='Edit Booking'
           isLoading={editLoading}
+          secondaryButton={deleteButtonProps}
         >
           <BookingForm onSubmit={onEdit}
             ref={editBookingRef}
             classrooms={[{ id: classroom?.id, name: classroom?.name }]}
             defaultValues={{ classroomId: classroom.id, date: selectedDate, description: bookings?.find(b => b.id === selectedBookingId)?.description || '' }}
             isEdit
+            isLoading={editLoading}
           />
         </CustomModal>}
     </>

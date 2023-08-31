@@ -35,6 +35,7 @@ export type BookingFormProps = {
   onSubmit: (data: BookingFormValues) => void;
   classrooms: Pick<Classroom, 'id' | 'name'>[];
   isEdit?: boolean;
+  isLoading?: boolean;
   defaultValues?: {
     classroomId: string;
     date: Date;
@@ -44,7 +45,7 @@ export type BookingFormProps = {
 //TODO: maybe find a better solution for date and time handling
 export type BookingFormValues = Pick<Booking, 'description' | 'classroomId'> & { day: Date, time: number }
 
-export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmit, classrooms, defaultValues, isEdit = false }, ref) => {
+export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmit, classrooms, defaultValues, isEdit = false, isLoading = false }, ref) => {
   const { register, handleSubmit, formState: { errors, isSubmitting, } } = useForm<BookingFormValues>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues ? {
@@ -61,8 +62,6 @@ export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmi
       await handleSubmit(onSubmit)();
     }
   }));
-
-  console.log(isSubmitting)
   return (
 
     <form>
@@ -78,7 +77,7 @@ export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmi
           />
           <FormErrorMessage>{errors.day?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl id="time" isInvalid={!!errors.time} isDisabled={!!defaultValues?.date || isEdit || isSubmitting}>
+        <FormControl id="time" isInvalid={!!errors.time} isDisabled={!!defaultValues?.date || isEdit || isLoading}>
           <FormLabel>time</FormLabel>
           <Select placeholder='Select option'  {...register('time')}>
             {
@@ -90,7 +89,7 @@ export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmi
           </Select>
           <FormErrorMessage>{errors.time?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl id="classroomId" isInvalid={!!errors.classroomId} isDisabled={!!defaultValues?.classroomId || isEdit || isSubmitting}>
+        <FormControl id="classroomId" isInvalid={!!errors.classroomId} isDisabled={!!defaultValues?.classroomId || isEdit || isLoading}>
           <FormLabel>classroom id</FormLabel>
           <Select placeholder='Select option' {...register('classroomId')}>
             {
@@ -101,7 +100,7 @@ export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmi
           </Select>
           <FormErrorMessage>{errors.classroomId?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl id="description" isDisabled={isSubmitting} >
+        <FormControl id="description" isDisabled={isLoading} >
           <FormLabel>Description</FormLabel>
           <Input type="text" {...register('description')} />
         </FormControl>
