@@ -1,14 +1,15 @@
-import { Button, Card, CardBody, Flex, Heading, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
-import React, { useRef, useState } from 'react'
+import { Card, CardBody, Flex, Heading, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
+import { useRef, useState } from 'react'
 import moment from 'moment';
-import BookingForm, { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
+import { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
 import { DeleteIcon } from '@chakra-ui/icons';
 import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
 import CustomModal from '../../components/Modal/Modal';
-import { Booking, BookingWithAllData, Classroom } from '../../types/types';
-import { useMutation, useQuery } from 'react-query';
+import { BookingWithAllData, Classroom } from '../../types/types';
+import { useQuery } from 'react-query';
 import { USER_ID } from '../../utils/constants';
-import axios from 'axios';
+import { useMutate } from '../../hooks/useMutate';
+import API from '../../utils/api';
 
 export const Bookings = () => {
 
@@ -37,36 +38,11 @@ export const Bookings = () => {
   };
   const { data, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery('bookings', getBookingsOfUser);
 
-  const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutation((bookingId: string) => {
-    const res = axios.delete(`http://localhost:8080/bookings/delete/${bookingId}`);
-    return res;
-  }, {
-    onSuccess: async () => {
-      toast({
-        title: 'Booking deleted.',
-        description: "Booking deleted successfully",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-      await refetchBookings();
-    },
-    onError: (err: Error) => {
-      toast({
-        title: err.message,
-        description: "Couldn't delete booking",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    },
-    onSettled: () => {
-      onCloseDelete()
-    }
-  });
-
-
-
+  const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutate(API.bookings.deleteBooking, { onSuccess: refetchBookings, onSettled: onCloseDelete }, {
+    title: 'Booking deleted.',
+    description: "Booking deleted successfully",
+    status: 'info'
+  }, { title: "Couldn't delete booking" })
 
 
   //TODO: think about the option for creating bookings from here

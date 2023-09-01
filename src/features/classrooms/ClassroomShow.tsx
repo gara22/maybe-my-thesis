@@ -1,18 +1,21 @@
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
-import { Box, Flex, Heading, Spinner, useDisclosure, useToast } from '@chakra-ui/react'
-import axios from 'axios';
+import { Flex, Heading, Spinner, useDisclosure, useToast } from '@chakra-ui/react'
 import moment from 'moment';
-import React, { useRef, useState } from 'react'
-import { useMutation, useQuery } from 'react-query';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useRef, useState } from 'react'
+import { useQuery } from 'react-query';
+import { useParams } from 'react-router-dom';
 import BookingForm, { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
+import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
 import { Calendar } from '../../components/Calendar/Calendar'
 import CustomModal from '../../components/Modal/Modal';
+import { useMutate } from '../../hooks/useMutate';
 import { Booking, BookingWithBooker, Classroom } from '../../types/types';
+import API from '../../utils/api';
 import { LENGTH_OF_WEEK, USER_ID, UTC_OFFSET } from '../../utils/constants';
 import { addDays, getDays, subtractDays } from '../../utils/dates';
 
-type BookingParams = Pick<Booking, 'from' | 'to' | 'classroomId' | 'description' | 'bookerId'>;
+//TODO: move this from here
+export type BookingParams = Pick<Booking, 'from' | 'to' | 'classroomId' | 'description' | 'bookerId'>;
 
 
 const ClassroomShow = () => {
@@ -26,6 +29,7 @@ const ClassroomShow = () => {
 
   const { isOpen: isOpenCreate, onOpen: onOpenCreate, onClose: onCloseCreate } = useDisclosure();
   const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
+  const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
   const days = getDays(currentWeekStartingDate, LENGTH_OF_WEEK);
   // const { data: bookings, isLoading: isBookingsLoading, refetch: refetchBookings } = api.booking.getBookingsOfClassroom.useQuery({ classroomId: id as string, from: days[0] as Date, to: moment(days[days.length - 1]).endOf('day').toDate() });
 
@@ -35,67 +39,7 @@ const ClassroomShow = () => {
 
   const createBookingRef = useRef<SubmitHandle>(null);
   const editBookingRef = useRef<SubmitHandle>(null);
-
-  const { mutate: createBooking, isLoading: isCreateLoading } = useMutation((data: BookingParams) => {
-    const res = axios.post("http://localhost:8080/bookings/new", data);
-    return res;
-  }, {
-    onSuccess: async () => {
-      toast({
-        title: 'Booking created.',
-        description: "Booking created successfully",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-      await refetchBookings();
-    },
-    onError: (err: Error) => {
-      toast({
-        title: err.message,
-        description: "Couldn't create booking",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    },
-    onSettled: () => {
-      onCloseCreate()
-    }
-  });
-
-  const { mutate: editBooking, isLoading: editLoading } = useMutation((data: Pick<Booking, 'id' | 'description'>) => {
-    const res = axios.put("http://localhost:8080/bookings/edit", data);
-    return res;
-  }, {
-    onSuccess: async () => {
-      toast({
-        title: 'Booking updated.',
-        description: "Booking updated successfully",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-      await refetchBookings();
-    },
-    onError: (err: Error) => {
-      toast({
-        title: err.message,
-        description: "Couldn't updated booking",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    },
-    onSettled: () => {
-      onCloseEdit()
-    }
-  });
-
-  const getClassroomById = async (id: string): Promise<{ classroom: Classroom }> => {
-    const res = await fetch(`http://localhost:8080/classrooms/${id}`);
-    return res.json();
-  };
+  const deleteBookingRef = useRef<DeleteHandle>(null);
 
   const getBookings = async (): Promise<{ bookings: BookingWithBooker[] }> => {
     const from = days[0];
@@ -103,10 +47,34 @@ const ClassroomShow = () => {
     const res = await fetch(`http://localhost:8080/bookings?from=${from.toISOString()}&to=${to.toISOString()}&classroomId=${id}`);
     return res.json();
   };
+
   const { data: classroomData, isLoading, refetch } = useQuery(['classroom', id], () => getClassroomById(id as string), { refetchOnWindowFocus: false });
   const { data: bookingsData, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery(['bookings', days], getBookings, { refetchOnWindowFocus: false });
   const classroom = classroomData?.classroom;
   const bookings = bookingsData?.bookings;
+
+  const { mutate: createBooking, isLoading: isCreateLoading } = useMutate<BookingParams>(API.bookings.createBooking, { onSuccess: refetchBookings, onSettled: onCloseCreate }, {
+    title: 'Booking created', description: "Booking created successfully"
+  }, { title: "Couldn't create booking" });
+
+  const { mutate: editBooking, isLoading: editLoading, } = useMutate<Pick<Booking, 'id' | 'description'>>(API.bookings.editBooking,
+    { onSettled: onCloseEdit, onSuccess: refetchBookings },
+    { title: 'Booking updated.', description: 'Booking updated successfully' }, {
+    title: "Couldn't update booking"
+  });
+
+  const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutate(API.bookings.deleteBooking, { onSuccess: refetchBookings, onSettled: () => { onCloseEdit(), onCloseDelete() } }, {
+    title: 'Booking deleted.',
+    description: "Booking deleted successfully",
+    status: 'info'
+  }, { title: "Couldn't delete booking" })
+
+  const getClassroomById = async (id: string): Promise<{ classroom: Classroom }> => {
+    const res = await fetch(`http://localhost:8080/classrooms/${id}`);
+    return res.json();
+  };
+
+
 
   const onCreate = (data: BookingFormValues) => {
     const { description, classroomId, day, time } = data;
@@ -141,6 +109,11 @@ const ClassroomShow = () => {
     editBooking({ ...bookingData, id: selectedBookingId as string })
   }
 
+  const onDelete = (id: string) => {
+    deleteBooking(id);
+  }
+
+
 
   function handleCellClick(date: Date, bookingId?: string): void {
     setSelectedDate(date);
@@ -153,7 +126,7 @@ const ClassroomShow = () => {
     bg: 'red.700 ',
     color: 'grey.400',
     title: 'Delete Booking',
-    onClick: () => console.log('delete'),
+    onClick: () => onOpenDelete(),
     isDisabled: false,
     _hover: {
       bg: 'red.900',
@@ -196,7 +169,7 @@ const ClassroomShow = () => {
           onClose={onCloseEdit}
           onSubmit={() => editBookingRef.current?._submit()}
           buttonLabel='Edit Booking'
-          isLoading={editLoading}
+          isLoading={editLoading || isDeleteLoading}
           secondaryButton={deleteButtonProps}
         >
           <BookingForm onSubmit={onEdit}
@@ -204,9 +177,12 @@ const ClassroomShow = () => {
             classrooms={[{ id: classroom?.id, name: classroom?.name }]}
             defaultValues={{ classroomId: classroom.id, date: selectedDate, description: bookings?.find(b => b.id === selectedBookingId)?.description || '' }}
             isEdit
-            isLoading={editLoading}
+            isLoading={editLoading || isDeleteLoading}
           />
         </CustomModal>}
+      <CustomModal title='Delete Booking' isLoading={isDeleteLoading} isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedBookingId(''); onCloseDelete() }} onSubmit={() => deleteBookingRef.current?._delete()}>
+        <DeleteBooking onDelete={onDelete} bookingId={selectedBookingId as string} ref={deleteBookingRef} />
+      </CustomModal>
     </>
   )
 }
