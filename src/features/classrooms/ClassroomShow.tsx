@@ -1,15 +1,15 @@
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
-import { Flex, Heading, Spinner, useDisclosure, useToast } from '@chakra-ui/react'
+import { Flex, Heading, Spinner, useDisclosure } from '@chakra-ui/react'
 import moment from 'moment';
 import { useRef, useState } from 'react'
 import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import BookingForm, { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
 import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
 import { Calendar } from '../../components/Calendar/Calendar'
 import CustomModal from '../../components/Modal/Modal';
 import { useMutate } from '../../hooks/useMutate';
-import { Booking, BookingWithBooker, Classroom } from '../../types/types';
+import { Booking, BookingWithBooker } from '../../types/types';
 import API from '../../utils/api';
 import { LENGTH_OF_WEEK, USER_ID, UTC_OFFSET } from '../../utils/constants';
 import { addDays, getDays, subtractDays } from '../../utils/dates';
@@ -19,23 +19,19 @@ export type BookingParams = Pick<Booking, 'from' | 'to' | 'classroomId' | 'descr
 
 
 const ClassroomShow = () => {
+  const [searchParams] = useSearchParams();
+  const dateParam = searchParams.get('date');
+  const startMoment = moment(dateParam).isValid() ? moment(dateParam) : moment();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
-  const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Date>(moment(new Date()).startOf('isoWeek').toDate());
+  const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Date>(startMoment.startOf('isoWeek').toDate());
   const { id } = useParams();
-
-  console.log(id)
   // const { data: classroom, isLoading, refetch } = api.classroom.getClassroomById.useQuery({ id } as { id: string });
 
   const { isOpen: isOpenCreate, onOpen: onOpenCreate, onClose: onCloseCreate } = useDisclosure();
   const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
   const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
   const days = getDays(currentWeekStartingDate, LENGTH_OF_WEEK);
-  // const { data: bookings, isLoading: isBookingsLoading, refetch: refetchBookings } = api.booking.getBookingsOfClassroom.useQuery({ classroomId: id as string, from: days[0] as Date, to: moment(days[days.length - 1]).endOf('day').toDate() });
-
-
-  const toast = useToast();
-
 
   const createBookingRef = useRef<SubmitHandle>(null);
   const editBookingRef = useRef<SubmitHandle>(null);

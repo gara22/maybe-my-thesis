@@ -1,4 +1,4 @@
-import { Card, CardBody, Flex, Heading, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
+import { Card, CardBody, Flex, Heading, Link, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import moment from 'moment';
 import { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
@@ -67,7 +67,11 @@ export const Bookings = () => {
           (data?.bookings.map(b => (
             <Card bg={bg} key={b.id} size='sm'>
               <CardBody>
-                <Heading size='xs' fontSize='md'>{b.classroom.name}</Heading>
+                <Heading size='xs' fontSize='md'>
+                  <Link href={`/classrooms/${b.classroomId}?date=${b.from}`} style={{ flexGrow: 1 }}>
+                    {b.classroom.name}
+                  </Link>
+                </Heading>
                 <Flex justifyContent='space-between' alignItems='center'>
                   <Flex gap='10px'>
                     <Text fontSize='xs' > {moment(b.from).format('YYYY/\MM/\DD HH:00')} -  {moment(b.to).format('HH:00')} {b.booker.name}</Text>

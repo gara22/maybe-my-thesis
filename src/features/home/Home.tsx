@@ -67,7 +67,7 @@ export const Home = () => {
                   </UnorderedList>
                 </CardBody>
                 <Button>
-                  <Link href={`/classrooms/${r.id}`} style={{ flexGrow: 1 }}>
+                  <Link href={`/classrooms/${r.id}?date=${inputs.from.toISOString()}`} style={{ flexGrow: 1 }}>
                     View here
                   </Link>
                 </Button>
