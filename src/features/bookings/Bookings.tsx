@@ -17,26 +17,10 @@ export const Bookings = () => {
   const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
   const [selectedBookingId, setSelectedBookingId] = useState('');
-  const toast = useToast()
 
-
-  const createBookingRef = useRef<SubmitHandle>(null);
   const deleteBookingRef = useRef<DeleteHandle>(null);
 
-  // const bookings: BookingWithAllData[] = [];
-  const classrooms: Classroom[] = []
-
-  const getClassrooms = async (): Promise<{ classrooms: Classroom[] }> => {
-    const res = await fetch("http://localhost:8080/classrooms");
-    return res.json();
-  };
-
-
-  const getBookingsOfUser = async (): Promise<{ bookings: BookingWithAllData[] }> => {
-    const res = await fetch(`http://localhost:8080/bookings/user?userId=${USER_ID}`);
-    return res.json();
-  };
-  const { data, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery('bookings', getBookingsOfUser);
+  const { data, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery('bookings', API.bookings.getBookingsOfUser);
 
   const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutate(API.bookings.deleteBooking, { onSuccess: refetchBookings, onSettled: onCloseDelete }, {
     title: 'Booking deleted.',

@@ -44,11 +44,10 @@ const ClassroomShow = () => {
   const getBookings = async (): Promise<{ bookings: BookingWithBooker[] }> => {
     const from = days[0];
     const to = moment(days[days.length - 1]).endOf('day').toDate();
-    const res = await fetch(`http://localhost:8080/bookings?from=${from.toISOString()}&to=${to.toISOString()}&classroomId=${id}`);
-    return res.json();
+    return API.bookings.getBookings(from, to, id as string)
   };
 
-  const { data: classroomData, isLoading, refetch } = useQuery(['classroom', id], () => getClassroomById(id as string), { refetchOnWindowFocus: false });
+  const { data: classroomData, isLoading, refetch } = useQuery(['classroom', id], () => API.classrooms.getClassroomById(id as string), { refetchOnWindowFocus: false });
   const { data: bookingsData, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery(['bookings', days], getBookings, { refetchOnWindowFocus: false });
   const classroom = classroomData?.classroom;
   const bookings = bookingsData?.bookings;
@@ -68,13 +67,6 @@ const ClassroomShow = () => {
     description: "Booking deleted successfully",
     status: 'info'
   }, { title: "Couldn't delete booking" })
-
-  const getClassroomById = async (id: string): Promise<{ classroom: Classroom }> => {
-    const res = await fetch(`http://localhost:8080/classrooms/${id}`);
-    return res.json();
-  };
-
-
 
   const onCreate = (data: BookingFormValues) => {
     const { description, classroomId, day, time } = data;

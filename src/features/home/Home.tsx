@@ -5,6 +5,7 @@ import { SimpleGrid, Card, Heading, CardBody, Button, Text, Spinner, Flex, ListI
 import FindClassroomForm from "../../components/Classroom/FindClassroomForm";
 import { Classroom, Booking } from "../../types/types";
 import { useQuery } from "react-query";
+import API from "../../utils/api";
 
 type SearchParams = {
   from: Date;
@@ -18,11 +19,7 @@ export const Home = () => {
 
   const getFreeClassrooms = async (): Promise<{ freeClassrooms: Classroom[] }> => {
     const { from, to, hasComputer } = inputs;
-    console.log(from.toISOString())
-
-    console.log("🚀 ~ file: Home.tsx:19 ~ getFreeClassrooms ~ data:", inputs)
-    const res = await fetch(`http://localhost:8080/classrooms/free?from=${from.toISOString()}&to=${to.toISOString()}&hasComputer=${hasComputer}`);
-    return res.json();
+    return API.classrooms.getFreeClassrooms(from, to, hasComputer);
   };
 
   const { data: rooms, isLoading, refetch, isFetching } = useQuery(['freeClassrooms', inputs.from, inputs.to, inputs.hasComputer], getFreeClassrooms, { enabled: inputs.enabled, refetchOnWindowFocus: false, onSuccess: () => console.log('asd') });

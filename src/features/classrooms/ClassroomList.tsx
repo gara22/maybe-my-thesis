@@ -1,13 +1,12 @@
-import { Card, CardBody, Flex, Heading, Link, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
+import { Button, Card, CardBody, Flex, Heading, Link, Spinner, Stack, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 
 import { DeleteIcon } from '@chakra-ui/icons';
 import CustomModal from '../../components/Modal/Modal';
 import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
-import { SubmitFormType } from '../../components/Classroom/ClassroomForm';
+import ClassroomForm, { SubmitFormType } from '../../components/Classroom/ClassroomForm';
 import { Classroom } from '../../types/types';
-import { useMutation, useQuery } from 'react-query';
-import axios from 'axios';
+import { useQuery } from 'react-query';
 import { useMutate } from '../../hooks/useMutate';
 import API from '../../utils/api';
 
@@ -18,49 +17,14 @@ export const Classrooms = () => {
 
   const [selectedClassroomId, setSelectedClassroomId] = useState('');
 
-
-  const toast = useToast()
-
   const createClassroomRef = useRef<SubmitFormType>(null);
   const deleteClassroomRef = useRef<DeleteHandle>(null);
 
-  // const classrooms: Classroom[] = [];
+  const { data, isLoading, refetch } = useQuery('classrooms', API.classrooms.getClassrooms);
 
-  const getClassrooms = async (): Promise<{ classrooms: Classroom[] }> => {
-    const res = await fetch("http://localhost:8080/classrooms");
-    return res.json();
-  };
-
-  const { mutate: createClassroom, isLoading: isCreateLoading } = useMutation((data: Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>) => {
-    const res = axios.post("http://localhost:8080/classrooms/new", data);
-    return res;
-  }, {
-    onSuccess: async () => {
-      toast({
-        title: 'Classroom created.',
-        description: "Classroom created successfully",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-      await refetch();
-    },
-    onError: (err: Error) => {
-      toast({
-        title: err.message,
-        description: "Couldn't create classroom",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    },
-    onSettled: () => {
-      onCloseCreate();
-    }
-  });
-
-  const { data, isLoading, refetch } = useQuery('classrooms', getClassrooms);
-
+  const { mutate: createClassroom, isLoading: isCreateLoading } = useMutate<Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>>(API.classrooms.createClassroom, { onSuccess: refetch, onSettled: onCloseCreate }, {
+    title: 'Classroom created.', description: "Classroom created successfully"
+  }, { title: "Couldn't create classroom" });
 
   const { mutate: deleteClassroom, isLoading: isDeleteLoading } = useMutate(API.classrooms.deleteClassroom, { onSuccess: refetch, onSettled: () => onCloseDelete() }, {
     title: 'Classroom deleted.',
@@ -86,7 +50,7 @@ export const Classrooms = () => {
         <h1>
           classrooms
         </h1>
-        {/* <Button onClick={onOpenCreate} width='2xs'>New Classroom</Button> */}
+        <Button onClick={onOpenCreate} width='2xs'>New Classroom</Button>
         {isLoading ?
           <Spinner />
           :
@@ -106,9 +70,9 @@ export const Classrooms = () => {
           )))
         }
       </Stack>
-      {/* <CustomModal title='Create Classroom' isLoading={isCreateLoading} isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createClassroomRef.current?._submit()} >
+      <CustomModal title='Create Classroom' isLoading={isCreateLoading} isOpen={isOpenCreate} onOpen={onOpenCreate} onClose={onCloseCreate} onSubmit={() => createClassroomRef.current?._submit()} >
         <ClassroomForm onSubmit={onCreate} ref={createClassroomRef} isLoading={isCreateLoading} />
-      </CustomModal> */}
+      </CustomModal>
       <CustomModal title='Delete Classroom' isLoading={isDeleteLoading} isOpen={isOpenDelete} onOpen={onOpenDelete} onClose={() => { setSelectedClassroomId(''); onCloseDelete() }} onSubmit={() => deleteClassroomRef.current?._delete()}>
         {/* TODO: make a general delete component */}
         <DeleteBooking onDelete={onDelete} bookingId={selectedClassroomId} ref={deleteClassroomRef} />
