@@ -47,7 +47,6 @@ export const FindClassroomForm = ({ onSubmit }: FindClassroomFormProps) => {
       <Stack spacing={6}>
         <FormControl id="day" isInvalid={!!errors.day}>
           <FormLabel>day</FormLabel>
-          {/* TODO: add default value to date input */}
           <Input
             placeholder="Select Date and Time"
             size="md"
