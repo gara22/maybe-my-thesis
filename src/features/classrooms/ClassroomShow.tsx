@@ -115,7 +115,7 @@ const ClassroomShow = () => {
     color: 'grey.400',
     title: 'Delete Booking',
     onClick: () => onOpenDelete(),
-    isDisabled: false,
+    isDisabled: (editLoading || isDeleteLoading),
     _hover: {
       bg: 'red.900',
     },
