@@ -109,7 +109,6 @@ const ClassroomShow = () => {
     bookingId ? onOpenEdit() : onOpenCreate();
   }
 
-  //TODO: Add delete functionality
   const deleteButtonProps = {
     bg: 'red.700 ',
     color: 'grey.400',
