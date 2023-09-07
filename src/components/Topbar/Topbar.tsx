@@ -19,6 +19,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { useAuth, useUser, useClerk } from '@clerk/clerk-react';
 
 const NavLink = ({ children, to }: { children: ReactNode, to: string }) => (
   <Link
@@ -38,10 +39,11 @@ const NavLink = ({ children, to }: { children: ReactNode, to: string }) => (
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
-  // const { data: sessionData } = useSession();
+  const { isSignedIn, signOut, } = useAuth();
+  const { user } = useUser();
+  const { redirectToSignIn } = useClerk()
 
   return (
-
     <Box bg={useColorModeValue('gray.100', 'gray.700')} px={4} shadow="md" zIndex={2} width='100%' >
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'} maxWidth='1024px' margin={'auto'}>
         <Flex gap={10}>
@@ -65,7 +67,7 @@ export default function Nav() {
               {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             </Button>
 
-            {/* {sessionData?.user ? <Menu>
+            {isSignedIn ? <Menu>
               <MenuButton
                 as={Button}
                 rounded={'full'}
@@ -74,7 +76,7 @@ export default function Nav() {
                 minW={0}>
                 <Avatar
                   size={'sm'}
-                  src={sessionData?.user.image ? sessionData.user.image : 'https://avatars.dicebear.com/api/male/username.svg'}
+                  src={user?.imageUrl ?? 'https://avatars.dicebear.com/api/male/username.svg'}
                 />
               </MenuButton>
               <MenuList alignItems={'center'}>
@@ -82,12 +84,12 @@ export default function Nav() {
                 <Center>
                   <Avatar
                     size={'2xl'}
-                    src={sessionData?.user.image ? sessionData.user.image : 'https://avatars.dicebear.com/api/male/username.svg'}
+                    src={user?.imageUrl ?? 'https://avatars.dicebear.com/api/male/username.svg'}
                   />
                 </Center>
                 <br />
                 <Center>
-                  <p>{sessionData.user?.name}</p>
+                  <p>{user?.firstName}</p>
                 </Center>
                 <br />
                 <MenuDivider />
@@ -95,9 +97,9 @@ export default function Nav() {
                 <MenuItem>Account Settings</MenuItem>
                 <MenuItem onClick={() => void signOut()}>Logout</MenuItem>
               </MenuList>
-            </Menu> : */}
-            <Button onClick={() => null}>Log in</Button>
-            {/* } */}
+            </Menu> :
+              <Button onClick={() => redirectToSignIn()}>Log in</Button>
+            }
           </Stack>
         </Flex>
       </Flex>
