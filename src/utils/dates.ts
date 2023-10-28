@@ -1,15 +1,15 @@
-import moment from "moment";
+import dayjs from "dayjs";
 
-export const getNameOfDay = (day: Date) => moment(day).format('dddd');
+export const getNameOfDay = (day: Date) => dayjs(day).format('dddd');
 
-export const getHourOfDay = (day: Date) => moment(day).hour();
+export const getHourOfDay = (day: Date) => dayjs(day).hour();
 
-export const addDays = (date: Date, days: number) => moment(date).add(days, 'days').toDate();
+export const addDays = (date: Date, days: number) => dayjs(date).add(days, 'days').toDate();
 
-export const subtractDays = (date: Date, days: number) => moment(date).subtract(days, 'days').toDate();
+export const subtractDays = (date: Date, days: number) => dayjs(date).subtract(days, 'days').toDate();
 
 export const getDays = (start: Date, numberOfDays: number) => {
-  const startMoment = moment(start).startOf('isoWeek');
+  const startMoment = dayjs(start).startOf('week');
   const days = Array(numberOfDays).fill(undefined).map((_, idx) => startMoment.clone().add(idx, 'day').toDate());
   return days;
 }

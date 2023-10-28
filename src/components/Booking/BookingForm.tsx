@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TIME_INTERVALS } from '../../utils/constants';
 import { getHourOfDay } from '../../utils/dates';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Classroom, Booking } from '../../types/types';
 
 const schema = z.object({
@@ -51,7 +51,7 @@ export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmi
     defaultValues: defaultValues ? {
       classroomId: defaultValues?.classroomId,
       time: getHourOfDay(defaultValues?.date),
-      day: moment(defaultValues.date).format('YYYY-MM-DD') as unknown as Date,
+      day: dayjs(defaultValues.date).format('YYYY-MM-DD') as unknown as Date,
       description: defaultValues.description ?? '',
 
     } : {}

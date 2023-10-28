@@ -1,6 +1,6 @@
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { Flex, Heading, Spinner, useDisclosure } from '@chakra-ui/react'
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { useRef, useState } from 'react'
 import { useQuery } from 'react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -21,10 +21,10 @@ export type BookingParams = Pick<Booking, 'from' | 'to' | 'classroomId' | 'descr
 const ClassroomShow = () => {
   const [searchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
-  const startMoment = moment(dateParam).isValid() ? moment(dateParam) : moment();
+  const startMoment = dayjs(dateParam).isValid() ? dayjs(dateParam) : dayjs();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
-  const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Date>(startMoment.startOf('isoWeek').toDate());
+  const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Date>(startMoment.startOf('week').toDate());
   const { id } = useParams();
   // const { data: classroom, isLoading, refetch } = api.classroom.getClassroomById.useQuery({ id } as { id: string });
 
@@ -39,7 +39,7 @@ const ClassroomShow = () => {
 
   const getBookings = async (): Promise<{ bookings: BookingWithBooker[] }> => {
     const from = days[0];
-    const to = moment(days[days.length - 1]).endOf('day').toDate();
+    const to = dayjs(days[days.length - 1]).endOf('day').toDate();
     return API.bookings.getBookings(from, to, id as string)
   };
 
@@ -67,8 +67,8 @@ const ClassroomShow = () => {
   const onCreate = (data: BookingFormValues) => {
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
-    const from = moment(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
-    const to = moment(day).add(Number(time), 'hours').toDate();
+    const from = dayjs(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
+    const to = dayjs(day).add(Number(time), 'hours').toDate();
 
     const bookingData = {
       from,
@@ -84,8 +84,8 @@ const ClassroomShow = () => {
   const onEdit = (data: BookingFormValues) => {
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
-    const from = moment(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
-    const to = moment(day).add(Number(time), 'hours').toDate();
+    const from = dayjs(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
+    const to = dayjs(day).add(Number(time), 'hours').toDate();
 
     const bookingData = {
       from,
@@ -178,7 +178,7 @@ const WeekSelector = ({ startDate, onDateChange }: { startDate: Date, onDateChan
   return (
     <Flex justifyContent='center' padding='10' fontSize='3xl' alignItems='center'>
       <ArrowBackIcon boxSize='10' onClick={() => onDateChange(subtractDays(startDate, 7))} cursor='pointer' />
-      Current week is: {moment(startDate).format('YYYY/MM/DD')} - {moment(startDate).add(LENGTH_OF_WEEK - 1, 'day').format('YYYY/MM/DD')}
+      Current week is: {dayjs(startDate).format('YYYY/MM/DD')} - {dayjs(startDate).add(LENGTH_OF_WEEK - 1, 'day').format('YYYY/MM/DD')}
       <ArrowForwardIcon boxSize='10' onClick={() => onDateChange(addDays(startDate, 7))} cursor='pointer' />
     </Flex>
   )

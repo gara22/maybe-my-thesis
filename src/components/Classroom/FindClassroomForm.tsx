@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { TIME_INTERVALS } from '../../utils/constants';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const schema = z.object({
   // classroomId: z.string().min(1, {
@@ -36,7 +36,7 @@ export const FindClassroomForm = ({ onSubmit }: FindClassroomFormProps) => {
     resolver: zodResolver(schema),
     mode: 'onTouched',
     defaultValues: {
-      day: moment(new Date).format('YYYY-MM-DD').toString() as unknown as Date,
+      day: dayjs(new Date).format('YYYY-MM-DD').toString() as unknown as Date,
       time: 8,
     }
   });

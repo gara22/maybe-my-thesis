@@ -1,6 +1,6 @@
 import { Card, CardBody, Flex, Heading, Link, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
 import { DeleteIcon } from '@chakra-ui/icons';
 import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
@@ -34,8 +34,8 @@ export const Bookings = () => {
     onCloseCreate();
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
-    const from = moment(day).add((Number(time) - 1), 'hours').toDate();
-    const to = moment(day).add(Number(time), 'hours').toDate();
+    const from = dayjs(day).add((Number(time) - 1), 'hours').toDate();
+    const to = dayjs(day).add(Number(time), 'hours').toDate();
 
     const bookingData = {
       from,
@@ -74,7 +74,7 @@ export const Bookings = () => {
                 </Heading>
                 <Flex justifyContent='space-between' alignItems='center'>
                   <Flex gap='10px'>
-                    <Text fontSize='xs' > {moment(b.from).format('YYYY/\MM/\DD HH:00')} -  {moment(b.to).format('HH:00')} {b.booker.name}</Text>
+                    <Text fontSize='xs' > {dayjs(b.from).format('YYYY/\MM/\DD HH:00')} -  {dayjs(b.to).format('HH:00')} {b.booker.name}</Text>
                     <Text fontSize='xs' > {b.description}</Text>
                   </Flex>
                   <DeleteIcon onClick={() => { setSelectedBookingId(b.id); onOpenDelete() }} w={6} h={6} color="red.500" _hover={{ color: 'red.800', cursor: 'pointer' }} />

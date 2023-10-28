@@ -1,6 +1,6 @@
 import { Flex, Grid, GridItem, GridItemProps } from '@chakra-ui/react'
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import React, { ReactNode } from 'react'
 import { BookingWithBooker } from '../../types/types';
 import { END_HOUR, START_HOUR } from '../../utils/constants';
@@ -13,7 +13,7 @@ export const Calendar = ({ days, onCellClick, bookings = [] }: { days: Date[]; o
   // console.log(first)
   const daysWithHours = hourInterval.reduce<Date[]>((acc, hour) => {
     for (const day of days) {
-      const item = moment(day).add(hour, 'hour').toDate();
+      const item = dayjs(day).add(hour, 'hour').toDate();
       acc.push(item)
     }
     return acc;
@@ -34,7 +34,7 @@ export const Calendar = ({ days, onCellClick, bookings = [] }: { days: Date[]; o
     <Grid gridTemplateColumns={`repeat(${days.length + 1}, 1fr)`} gridTemplateRows={`repeat(${hourInterval.length} minmax(50px, 1fr))`}>
       <>
         <HeaderCell> </HeaderCell>
-        {days.map(day => <HeaderCell key={moment(day).format('MM/dd')}><><span>{moment(day).format('dddd')}</span> <span>{moment(day).format('MM/DD')}</span></></HeaderCell>)}
+        {days.map(day => <HeaderCell key={dayjs(day).format('MM/dd')}><><span>{dayjs(day).format('dddd')}</span> <span>{dayjs(day).format('MM/DD')}</span></></HeaderCell>)}
         {hourInterval.map((hour, idx) => (<Cell
           bg='gray.700'
           gridColumn={1}

@@ -1,5 +1,5 @@
 
-import moment from "moment";
+import dayjs from "dayjs";
 import { useState } from "react";
 import { SimpleGrid, Card, Heading, CardBody, Button, Text, Spinner, Flex, ListItem, UnorderedList, Link } from "@chakra-ui/react";
 import FindClassroomForm from "../../components/Classroom/FindClassroomForm";
@@ -32,8 +32,8 @@ export const Home = () => {
     const { day, time, hasComputer } = data;
     //TODO: convert time to number in bookingform
     //TODO: investigate time zones. why do we need -2? 
-    const from = moment(day).add(Number(time) - 2, 'hours').toDate();
-    const to = moment(day).add(Number(time) - 1, 'hours').toDate();
+    const from = dayjs(day).add(Number(time) - 2, 'hours').toDate();
+    const to = dayjs(day).add(Number(time) - 1, 'hours').toDate();
 
     const bookingData = {
       from,
@@ -60,7 +60,7 @@ export const Home = () => {
               <Card bg='gray.600' key={r.id}>
                 <CardBody>
                   <Heading size='md'>{r.name}</Heading>
-                  <Text fontSize='xs'> {moment(inputs.from).format('YYYY/\MM/\DD HH:00')} -  {moment(inputs.to).format('HH:00')}</Text>
+                  <Text fontSize='xs'> {dayjs(inputs.from).format('YYYY/\MM/\DD HH:00')} -  {dayjs(inputs.to).format('HH:00')}</Text>
                   <UnorderedList fontSize='sm' paddingLeft='10px' paddingTop='10px'>
                     <ListItem>Capacity: {r.capacity}</ListItem>
                     <ListItem>Has computers:  {r.hasComputer ? 'Yes' : 'No'}</ListItem>
