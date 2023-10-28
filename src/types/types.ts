@@ -1,3 +1,5 @@
+import { UserResource } from "@clerk/types"
+
 /**
  * Model Account
  * 
@@ -28,19 +30,6 @@ export type Session = {
   expires: Date
 }
 
-/**
- * Model User
- * 
- */
-export type User = {
-  id: string
-  name: string | null
-  userName: string | null
-  email: string | null
-  emailVerified: Date | null
-  image: string | null
-  role: string
-}
 
 /**
  * Model VerificationToken
@@ -81,7 +70,7 @@ export type Booking = {
 }
 
 export type BookingWithAllData = {
-  booker: Pick<User, 'name'>,
+  booker: Pick<UserResource, 'username'>,
   classroom: Classroom
 } & Booking;
 

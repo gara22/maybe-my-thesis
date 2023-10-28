@@ -1,5 +1,6 @@
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { Flex, Heading, Spinner, useDisclosure } from '@chakra-ui/react'
+import { useUser } from '@clerk/clerk-react';
 import dayjs from 'dayjs';
 import { useRef, useState } from 'react'
 import { useQuery } from 'react-query';
@@ -26,6 +27,9 @@ const ClassroomShow = () => {
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Date>(startMoment.startOf('week').toDate());
   const { id } = useParams();
+  //TODO: not sure if this is the right approach
+  const { user } = useUser();
+
   // const { data: classroom, isLoading, refetch } = api.classroom.getClassroomById.useQuery({ id } as { id: string });
 
   const { isOpen: isOpenCreate, onOpen: onOpenCreate, onClose: onCloseCreate } = useDisclosure();
@@ -75,7 +79,7 @@ const ClassroomShow = () => {
       to,
       classroomId,
       description: description || '',
-      bookerId: USER_ID,
+      bookerId: user?.id as string,
     }
 
     createBooking(bookingData);

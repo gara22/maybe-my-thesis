@@ -48,7 +48,7 @@ export const Calendar = ({ days, onCellClick, bookings = [] }: { days: Date[]; o
             date={day.date}>
             <>
               <span>
-                {day.booking ? day.booking.booker.name : 'free'}
+                {day.booking ? day.booking.booker.username : 'free'}
               </span>
               <span>
                 {day.booking?.description}

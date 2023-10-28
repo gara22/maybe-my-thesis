@@ -1,15 +1,14 @@
-import { Card, CardBody, Flex, Heading, Link, Spinner, Stack, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react'
+import { Card, CardBody, Flex, Heading, Link, Spinner, Stack, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import dayjs from 'dayjs';
-import { BookingFormValues, SubmitHandle } from '../../components/Booking/BookingForm';
+import { BookingFormValues } from '../../components/Booking/BookingForm';
 import { DeleteIcon } from '@chakra-ui/icons';
 import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
 import CustomModal from '../../components/Modal/Modal';
-import { BookingWithAllData, Classroom } from '../../types/types';
 import { useQuery } from 'react-query';
-import { USER_ID } from '../../utils/constants';
 import { useMutate } from '../../hooks/useMutate';
 import API from '../../utils/api';
+import { useUser } from '@clerk/clerk-react';
 
 export const Bookings = () => {
 
@@ -17,10 +16,11 @@ export const Bookings = () => {
   const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
   const [selectedBookingId, setSelectedBookingId] = useState('');
+  const { user } = useUser();
 
   const deleteBookingRef = useRef<DeleteHandle>(null);
 
-  const { data, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery('bookings', API.bookings.getBookingsOfUser);
+  const { data, isLoading: isBookingsLoading, refetch: refetchBookings } = useQuery(['bookings', user?.id], () => API.bookings.getBookingsOfUser(user?.id as string));
 
   const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutate(API.bookings.deleteBooking, { onSuccess: refetchBookings, onSettled: onCloseDelete }, {
     title: 'Booking deleted.',
@@ -74,7 +74,7 @@ export const Bookings = () => {
                 </Heading>
                 <Flex justifyContent='space-between' alignItems='center'>
                   <Flex gap='10px'>
-                    <Text fontSize='xs' > {dayjs(b.from).format('YYYY/\MM/\DD HH:00')} -  {dayjs(b.to).format('HH:00')} {b.booker.name}</Text>
+                    <Text fontSize='xs' > {dayjs(b.from).format('YYYY/\MM/\DD HH:00')} -  {dayjs(b.to).format('HH:00')} {b.booker.username}</Text>
                     <Text fontSize='xs' > {b.description}</Text>
                   </Flex>
                   <DeleteIcon onClick={() => { setSelectedBookingId(b.id); onOpenDelete() }} w={6} h={6} color="red.500" _hover={{ color: 'red.800', cursor: 'pointer' }} />

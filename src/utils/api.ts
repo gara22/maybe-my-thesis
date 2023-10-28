@@ -18,8 +18,8 @@ const deleteBooking = (bookingId: string) => {
   return res;
 }
 
-const getBookingsOfUser = async (): Promise<{ bookings: BookingWithAllData[] }> => {
-  const res = await fetch(`http://localhost:8080/bookings/user?userId=${USER_ID}`);
+const getBookingsOfUser = async (userId: string): Promise<{ bookings: BookingWithAllData[] }> => {
+  const res = await fetch(`http://localhost:8080/bookings/user?userId=${userId}`);
   return res.json();
 };
 
