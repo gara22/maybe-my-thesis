@@ -1,19 +1,19 @@
 import { Flex, Grid, GridItem, GridItemProps } from '@chakra-ui/react'
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import React, { ReactNode } from 'react'
 import { BookingWithBooker } from '../../types/types';
 import { END_HOUR, START_HOUR } from '../../utils/constants';
 import { getHourOfDay, getHoursInterval, getNameOfDay } from '../../utils/dates';
 
-export const Calendar = ({ days, onCellClick, bookings = [] }: { days: Date[]; onCellClick: (date: Date, bookingId?: string) => void, bookings: BookingWithBooker[] }) => {
+export const Calendar = ({ days, onCellClick, bookings = [] }: { days: Dayjs[]; onCellClick: (date: Dayjs, bookingId?: string) => void, bookings: BookingWithBooker[] }) => {
 
   const hourInterval = getHoursInterval(START_HOUR, END_HOUR);
 
   // console.log(first)
-  const daysWithHours = hourInterval.reduce<Date[]>((acc, hour) => {
+  const daysWithHours = hourInterval.reduce<Dayjs[]>((acc, hour) => {
     for (const day of days) {
-      const item = dayjs(day).add(hour, 'hour').toDate();
+      const item = dayjs.utc(day).add(hour, 'hour')
       acc.push(item)
     }
     return acc;
@@ -22,7 +22,7 @@ export const Calendar = ({ days, onCellClick, bookings = [] }: { days: Date[]; o
   //TODO: rethink this, find more optimal solution
   const daysWithBookings = daysWithHours.map(day => {
     const bookingMatch = bookings.filter(b => {
-      return getHourOfDay(b.from) === getHourOfDay(day) && getNameOfDay(b.from) === getNameOfDay(day)
+      return getHourOfDay(dayjs.utc(b.from)) === getHourOfDay(day) && getNameOfDay(dayjs.utc(b.from)) === getNameOfDay(day)
     })
     return {
       date: day,
@@ -83,6 +83,6 @@ interface CellProps extends GridItemProps {
 
 interface BookingCellProps extends CellProps {
   booking?: BookingWithBooker;
-  date: Date;
+  date: Dayjs;
 
 }

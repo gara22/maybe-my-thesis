@@ -1,7 +1,7 @@
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { Flex, Heading, Spinner, useDisclosure } from '@chakra-ui/react'
 import { useUser } from '@clerk/clerk-react';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { useRef, useState } from 'react'
 import { useQuery } from 'react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -22,10 +22,10 @@ export type BookingParams = Pick<Booking, 'from' | 'to' | 'classroomId' | 'descr
 const ClassroomShow = () => {
   const [searchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
-  const startMoment = dayjs(dateParam).isValid() ? dayjs(dateParam) : dayjs();
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const initStartDate = dayjs(dateParam).isValid() ? dayjs(dateParam) : dayjs();
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
-  const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Date>(startMoment.startOf('week').toDate());
+  const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Dayjs>(initStartDate.day(1));
   const { id } = useParams();
   //TODO: not sure if this is the right approach
   const { user } = useUser();
@@ -42,7 +42,7 @@ const ClassroomShow = () => {
   const deleteBookingRef = useRef<DeleteHandle>(null);
 
   const getBookings = async (): Promise<{ bookings: BookingWithBooker[] }> => {
-    const from = days[0];
+    const from = days[0].toDate();
     const to = dayjs(days[days.length - 1]).endOf('day').toDate();
     return API.bookings.getBookings(from, to, id as string)
   };
@@ -69,10 +69,11 @@ const ClassroomShow = () => {
   }, { title: "Couldn't delete booking" })
 
   const onCreate = (data: BookingFormValues) => {
-    const { description, classroomId, day, time } = data;
+    const { description, classroomId, day } = data;
+
     //TODO: convert time to number in bookingform
-    const from = dayjs(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
-    const to = dayjs(day).add(Number(time), 'hours').toDate();
+    const from = dayjs.utc(day).toDate();
+    const to = dayjs.utc(day).add(1, 'hours').toDate();
 
     const bookingData = {
       from,
@@ -88,8 +89,8 @@ const ClassroomShow = () => {
   const onEdit = (data: BookingFormValues) => {
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
-    const from = dayjs(day).add((Number(time) - UTC_OFFSET), 'hours').toDate();
-    const to = dayjs(day).add(Number(time), 'hours').toDate();
+    const from = dayjs.utc(day).toDate();
+    const to = dayjs.utc(day).add(1, 'hours').toDate();
 
     const bookingData = {
       from,
@@ -107,7 +108,7 @@ const ClassroomShow = () => {
 
 
 
-  function handleCellClick(date: Date, bookingId?: string): void {
+  function handleCellClick(date: Dayjs, bookingId?: string): void {
     setSelectedDate(date);
     setSelectedBookingId(bookingId || null);
     bookingId ? onOpenEdit() : onOpenCreate();
@@ -149,7 +150,7 @@ const ClassroomShow = () => {
           <BookingForm onSubmit={onCreate}
             ref={createBookingRef}
             classrooms={[{ id: classroom?.id, name: classroom?.name }]}
-            defaultValues={{ classroomId: classroom.id, date: selectedDate, }}
+            defaultValues={{ classroomId: classroom.id, date: selectedDate }}
             isLoading={isCreateLoading}
           />
         </CustomModal>}
@@ -178,11 +179,11 @@ const ClassroomShow = () => {
   )
 }
 
-const WeekSelector = ({ startDate, onDateChange }: { startDate: Date, onDateChange: (updatedDate: Date) => void }) => {
+const WeekSelector = ({ startDate, onDateChange }: { startDate: Dayjs, onDateChange: (updatedDate: Dayjs) => void }) => {
   return (
     <Flex justifyContent='center' padding='10' fontSize='3xl' alignItems='center'>
       <ArrowBackIcon boxSize='10' onClick={() => onDateChange(subtractDays(startDate, 7))} cursor='pointer' />
-      Current week is: {dayjs(startDate).format('YYYY/MM/DD')} - {dayjs(startDate).add(LENGTH_OF_WEEK - 1, 'day').format('YYYY/MM/DD')}
+      Current week is: {startDate.format('YYYY/MM/DD')} - {dayjs(startDate).add(LENGTH_OF_WEEK - 1, 'day').format('YYYY/MM/DD')}
       <ArrowForwardIcon boxSize='10' onClick={() => onDateChange(addDays(startDate, 7))} cursor='pointer' />
     </Flex>
   )

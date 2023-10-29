@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TIME_INTERVALS } from '../../utils/constants';
 import { getHourOfDay } from '../../utils/dates';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Classroom, Booking } from '../../types/types';
 
 const schema = z.object({
@@ -38,20 +38,23 @@ export type BookingFormProps = {
   isLoading?: boolean;
   defaultValues?: {
     classroomId: string;
-    date: Date;
+    date: Dayjs;
     description?: string;
   }
 }
 //TODO: maybe find a better solution for date and time handling
-export type BookingFormValues = Pick<Booking, 'description' | 'classroomId'> & { day: Date, time: number }
+export type BookingFormValues = Pick<Booking, 'description' | 'classroomId'> & { day: Dayjs, time: number }
 
 export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(({ onSubmit, classrooms, defaultValues, isEdit = false, isLoading = false }, ref) => {
+  console.log("🚀 ~ file: BookingForm.tsx:49 ~ BookingForm ~ defaultValues:", defaultValues)
   const { register, handleSubmit, formState: { errors, isSubmitting, } } = useForm<BookingFormValues>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues ? {
       classroomId: defaultValues?.classroomId,
-      time: getHourOfDay(defaultValues?.date),
-      day: dayjs(defaultValues.date).format('YYYY-MM-DD') as unknown as Date,
+      //TODO: figure out why we need to add 1
+      time: getHourOfDay(defaultValues?.date) + 1,
+      //TODO: maybe convert date to string so input element can accept it
+      day: defaultValues.date,
       description: defaultValues.description ?? '',
 
     } : {}
