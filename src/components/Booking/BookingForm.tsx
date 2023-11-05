@@ -53,10 +53,6 @@ export const BookingForm = forwardRef<SubmitHandle, BookingFormProps>(
     { onSubmit, classrooms, defaultValues, isEdit = false, isLoading = false },
     ref
   ) => {
-    console.log(
-      "🚀 ~ file: BookingForm.tsx:49 ~ BookingForm ~ defaultValues:",
-      defaultValues
-    );
     const {
       register,
       handleSubmit,
