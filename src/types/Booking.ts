@@ -19,4 +19,4 @@
 //   description: string;
 // }
 
-export type a = {}
+export type a = {};

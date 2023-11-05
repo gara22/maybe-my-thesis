@@ -4,4 +4,4 @@
 //   capacity: number;
 //   hasComputers: boolean;
 // }
-export type a = {}
+export type a = {};

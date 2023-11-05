@@ -1,9 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export const Admin = () => {
-  return (
-    <div>
-      admin
-    </div>
-  )
-}
+  return <div>admin</div>;
+};

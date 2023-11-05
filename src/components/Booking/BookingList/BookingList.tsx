@@ -1,9 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export const BookingList = () => {
-  return (
-    <div>
-      bookings
-    </div>
-  )
-}
+  return <div>bookings</div>;
+};

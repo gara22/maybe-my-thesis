@@ -6,7 +6,6 @@
 
 // const URL_PREFIX = import.meta.env.VITE_SERVER_URL_DEV;
 
-
 // type GetBookingsResponse = {
 
 //   bookings: BookingResponse[],
@@ -17,7 +16,6 @@
 //   try {
 //     const { data } = await axios.get<GetBookingsResponse>(URL_PREFIX + '/bookings/all');
 //     return data
-
 
 //   } catch (error) {
 //     return {
@@ -52,4 +50,4 @@
 //   return bookings;
 
 // }
-export type a = {}
+export type a = {};

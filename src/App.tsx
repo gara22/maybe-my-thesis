@@ -1,16 +1,13 @@
-import Topbar from './components/Topbar/Topbar'
+import Topbar from "./components/Topbar/Topbar";
 
-import {
-  Outlet,
-} from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import "./index.css";
-import { Page } from './components/Page/Page'
-import { SignedIn, SignedOut, useClerk } from '@clerk/clerk-react';
-import { Button } from '@chakra-ui/react';
-
+import { Page } from "./components/Page/Page";
+import { SignedIn, SignedOut, useClerk } from "@clerk/clerk-react";
+import { Button } from "@chakra-ui/react";
 
 function App() {
-  const { redirectToSignIn } = useClerk()
+  const { redirectToSignIn } = useClerk();
   return (
     <>
       <Topbar />
@@ -18,13 +15,12 @@ function App() {
         <Page>
           <Outlet />
         </Page>
-
       </SignedIn>
       <SignedOut>
         <Button onClick={() => redirectToSignIn()}>sign in</Button>
       </SignedOut>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

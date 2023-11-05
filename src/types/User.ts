@@ -8,4 +8,4 @@ import { ADMIN, STUDENT, TEACHER } from "./constants";
 //   role: UserRole;
 // }
 
-export type UserRole = typeof TEACHER | typeof STUDENT | typeof ADMIN
+export type UserRole = typeof TEACHER | typeof STUDENT | typeof ADMIN;
