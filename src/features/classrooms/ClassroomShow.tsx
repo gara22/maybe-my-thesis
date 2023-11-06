@@ -32,10 +32,10 @@ const ClassroomShow = () => {
   const initStartDate = dayjs(dateParam).isValid() ? dayjs(dateParam) : dayjs();
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
-    null,
+    null
   );
   const [currentWeekStartingDate, setCurrentWeekStartingDate] = useState<Dayjs>(
-    initStartDate.day(1),
+    initStartDate.day(1)
   );
   const { id } = useParams();
   //TODO: not sure if this is the right approach
@@ -79,11 +79,12 @@ const ClassroomShow = () => {
   } = useQuery(
     ["classroom", id],
     () => API.classrooms.getClassroomById(id as string),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
   const {
     data: bookingsData,
     isLoading: isBookingsLoading,
+    isFetching: isBookingsFetching,
     refetch: refetchBookings,
   } = useQuery(["bookings", days], getBookings, {
     refetchOnWindowFocus: false,
@@ -99,7 +100,7 @@ const ClassroomShow = () => {
         title: "Booking created",
         description: "Booking created successfully",
       },
-      { title: "Couldn't create booking" },
+      { title: "Couldn't create booking" }
     );
 
   const { mutate: editBooking, isLoading: editLoading } = useMutate<
@@ -110,7 +111,7 @@ const ClassroomShow = () => {
     { title: "Booking updated.", description: "Booking updated successfully" },
     {
       title: "Couldn't update booking",
-    },
+    }
   );
 
   const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutate(
@@ -126,7 +127,7 @@ const ClassroomShow = () => {
       description: "Booking deleted successfully",
       status: "info",
     },
-    { title: "Couldn't delete booking" },
+    { title: "Couldn't delete booking" }
   );
 
   const onCreate = (data: BookingFormValues) => {
@@ -200,6 +201,7 @@ const ClassroomShow = () => {
           days={days}
           onCellClick={handleCellClick}
           bookings={bookings || []}
+          isLoading={isBookingsLoading || isBookingsFetching}
         />
       </Flex>
       {selectedDate && (

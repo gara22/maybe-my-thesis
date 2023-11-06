@@ -1,4 +1,4 @@
-import { Flex, Grid, GridItem, GridItemProps } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, GridItemProps, Spinner } from "@chakra-ui/react";
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 import dayjs, { Dayjs } from "dayjs";
 import React, { ReactNode } from "react";
@@ -14,10 +14,12 @@ export const Calendar = ({
   days,
   onCellClick,
   bookings = [],
+  isLoading = false,
 }: {
   days: Dayjs[];
   onCellClick: (date: Dayjs, bookingId?: string) => void;
   bookings: BookingWithBooker[];
+  isLoading: boolean;
 }) => {
   const hourInterval = getHoursInterval(START_HOUR, END_HOUR);
 
@@ -67,9 +69,13 @@ export const Calendar = ({
         {daysWithBookings.map((day) => (
           <BookingCell
             booking={day.booking}
-            onClick={() => onCellClick(day.date, day.booking?.id)}
+            onClick={() => {
+              if (!isLoading) onCellClick(day.date, day.booking?.id);
+            }}
             key={` ${getNameOfDay(day.date)} + ${getHourOfDay(day.date)}`}
             date={day.date}
+            isDisabled={isLoading}
+            isLoading={isLoading}
           >
             <>
               <span>{day.booking ? day.booking.booker.username : "free"}</span>
@@ -82,13 +88,25 @@ export const Calendar = ({
   );
 };
 
-const Cell = ({ children, ...rest }: CellProps): ReactJSXElement => {
+const Cell = ({
+  children,
+  isDisabled,
+  isLoading,
+  ...rest
+}: CellProps): ReactJSXElement => {
+  const disabledStyles = isDisabled
+    ? {
+        _hover: { cursor: "not-allowed" },
+        opacity: isDisabled ? 0.5 : 1,
+      }
+    : {};
   return (
     <GridItem
       height="120px"
       outlineColor={"gray.500"}
       outline="1px solid"
       {...rest}
+      {...disabledStyles}
     >
       <Flex
         height={"100%"}
@@ -96,7 +114,7 @@ const Cell = ({ children, ...rest }: CellProps): ReactJSXElement => {
         alignItems="center"
         flexDirection="column"
       >
-        {children}
+        {isLoading ? <Spinner /> : children}
       </Flex>
     </GridItem>
   );
@@ -125,6 +143,8 @@ const BookingCell = ({
 
 interface CellProps extends GridItemProps {
   children: ReactNode;
+  isDisabled?: boolean;
+  isLoading?: boolean;
 }
 
 interface BookingCellProps extends CellProps {
