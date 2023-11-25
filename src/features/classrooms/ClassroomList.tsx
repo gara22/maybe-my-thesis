@@ -10,52 +10,37 @@ import {
   Text,
   useColorModeValue,
   useDisclosure,
-} from "@chakra-ui/react";
-import { useRef, useState } from "react";
+} from '@chakra-ui/react';
+import { useRef, useState } from 'react';
 
-import { DeleteIcon } from "@chakra-ui/icons";
-import CustomModal from "../../components/Modal/Modal";
-import DeleteBooking, {
-  DeleteHandle,
-} from "../../components/Booking/DeleteBooking";
-import ClassroomForm, {
-  SubmitFormType,
-} from "../../components/Classroom/ClassroomForm";
-import { Classroom } from "../../types/types";
-import { useQuery } from "react-query";
-import { useMutate } from "../../hooks/useMutate";
-import API from "../../utils/api";
+import { DeleteIcon } from '@chakra-ui/icons';
+import CustomModal from '../../components/Modal/Modal';
+import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
+import ClassroomForm, { SubmitFormType } from '../../components/Classroom/ClassroomForm';
+import { Classroom } from '../../types/types';
+import { useQuery } from 'react-query';
+import { useMutate } from '../../hooks/useMutate';
+import API from '../../utils/api';
 
 export const Classrooms = () => {
-  const {
-    isOpen: isOpenCreate,
-    onOpen: onOpenCreate,
-    onClose: onCloseCreate,
-  } = useDisclosure();
-  const {
-    isOpen: isOpenDelete,
-    onOpen: onOpenDelete,
-    onClose: onCloseDelete,
-  } = useDisclosure();
+  const { isOpen: isOpenCreate, onOpen: onOpenCreate, onClose: onCloseCreate } = useDisclosure();
+  const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
-  const [selectedClassroomId, setSelectedClassroomId] = useState("");
+  const [selectedClassroomId, setSelectedClassroomId] = useState('');
 
   const createClassroomRef = useRef<SubmitFormType>(null);
   const deleteClassroomRef = useRef<DeleteHandle>(null);
 
-  const { data, isLoading, refetch } = useQuery(
-    "classrooms",
-    API.classrooms.getClassrooms,
-  );
+  const { data, isLoading, refetch } = useQuery('classrooms', API.classrooms.getClassrooms);
 
   const { mutate: createClassroom, isLoading: isCreateLoading } = useMutate<
-    Pick<Classroom, "name" | "capacity" | "hasComputer">
+    Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>
   >(
     API.classrooms.createClassroom,
     { onSuccess: refetch, onSettled: onCloseCreate },
     {
-      title: "Classroom created.",
-      description: "Classroom created successfully",
+      title: 'Classroom created.',
+      description: 'Classroom created successfully',
     },
     { title: "Couldn't create classroom" },
   );
@@ -64,9 +49,9 @@ export const Classrooms = () => {
     API.classrooms.deleteClassroom,
     { onSuccess: refetch, onSettled: () => onCloseDelete() },
     {
-      title: "Classroom deleted.",
-      description: "Classroom deleted successfully",
-      status: "info",
+      title: 'Classroom deleted.',
+      description: 'Classroom deleted successfully',
+      status: 'info',
     },
     { title: "Couldn't delete Classroom" },
   );
@@ -75,13 +60,11 @@ export const Classrooms = () => {
     deleteClassroom(id);
   };
 
-  const onCreate = (
-    data: Pick<Classroom, "name" | "capacity" | "hasComputer">,
-  ) => {
+  const onCreate = (data: Pick<Classroom, 'name' | 'capacity' | 'hasComputer'>) => {
     createClassroom(data);
   };
 
-  const bg = useColorModeValue("gray.200", "gray.600");
+  const bg = useColorModeValue('gray.200', 'gray.600');
 
   return (
     <>
@@ -102,10 +85,7 @@ export const Classrooms = () => {
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex gap="10px">
                     <Text fontSize="xs">Capacity: {c.capacity} </Text>
-                    <Text fontSize="xs">
-                      {" "}
-                      Has computers: {c.hasComputer ? "Yes" : "No"}{" "}
-                    </Text>
+                    <Text fontSize="xs"> Has computers: {c.hasComputer ? 'Yes' : 'No'} </Text>
                   </Flex>
                   <DeleteIcon
                     onClick={() => {
@@ -115,7 +95,7 @@ export const Classrooms = () => {
                     w={6}
                     h={6}
                     color="red.500"
-                    _hover={{ color: "red.800", cursor: "pointer" }}
+                    _hover={{ color: 'red.800', cursor: 'pointer' }}
                   />
                 </Flex>
               </CardBody>
@@ -131,11 +111,7 @@ export const Classrooms = () => {
         onClose={onCloseCreate}
         onSubmit={() => createClassroomRef.current?._submit()}
       >
-        <ClassroomForm
-          onSubmit={onCreate}
-          ref={createClassroomRef}
-          isLoading={isCreateLoading}
-        />
+        <ClassroomForm onSubmit={onCreate} ref={createClassroomRef} isLoading={isCreateLoading} />
       </CustomModal>
       <CustomModal
         title="Delete Classroom"
@@ -143,17 +119,13 @@ export const Classrooms = () => {
         isOpen={isOpenDelete}
         onOpen={onOpenDelete}
         onClose={() => {
-          setSelectedClassroomId("");
+          setSelectedClassroomId('');
           onCloseDelete();
         }}
         onSubmit={() => deleteClassroomRef.current?._delete()}
       >
         {/* TODO: make a general delete component */}
-        <DeleteBooking
-          onDelete={onDelete}
-          bookingId={selectedClassroomId}
-          ref={deleteClassroomRef}
-        />
+        <DeleteBooking onDelete={onDelete} bookingId={selectedClassroomId} ref={deleteClassroomRef} />
       </CustomModal>
     </>
   );

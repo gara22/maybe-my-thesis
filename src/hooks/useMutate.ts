@@ -1,6 +1,6 @@
-import { useToast, UseToastOptions } from "@chakra-ui/react";
-import { AxiosResponse } from "axios";
-import { useMutation } from "react-query";
+import { useToast, UseToastOptions } from '@chakra-ui/react';
+import { AxiosResponse } from 'axios';
+import { useMutation } from 'react-query';
 
 type FetchFunction<T> = (data: T) => Promise<AxiosResponse<any, any>>;
 
@@ -27,9 +27,9 @@ export function useMutate<T>(
     {
       onSuccess: async () => {
         toast({
-          title: "Successful",
-          description: "Operation successful",
-          status: "success",
+          title: 'Successful',
+          description: 'Operation successful',
+          status: 'success',
           duration: 5000,
           isClosable: true,
           ...successToast,
@@ -38,9 +38,9 @@ export function useMutate<T>(
       },
       onError: (err: Error) => {
         toast({
-          title: "Failure",
+          title: 'Failure',
           description: err.message,
-          status: "error",
+          status: 'error',
           duration: 5000,
           isClosable: true,
           ...failureToast,

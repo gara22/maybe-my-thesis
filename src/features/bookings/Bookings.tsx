@@ -9,33 +9,23 @@ import {
   Text,
   useColorModeValue,
   useDisclosure,
-} from "@chakra-ui/react";
-import { useRef, useState } from "react";
-import dayjs from "dayjs";
-import { BookingFormValues } from "../../components/Booking/BookingForm";
-import { DeleteIcon } from "@chakra-ui/icons";
-import DeleteBooking, {
-  DeleteHandle,
-} from "../../components/Booking/DeleteBooking";
-import CustomModal from "../../components/Modal/Modal";
-import { useQuery } from "react-query";
-import { useMutate } from "../../hooks/useMutate";
-import API from "../../utils/api";
-import { useUser } from "@clerk/clerk-react";
+} from '@chakra-ui/react';
+import { useRef, useState } from 'react';
+import dayjs from 'dayjs';
+import { BookingFormValues } from '../../components/Booking/BookingForm';
+import { DeleteIcon } from '@chakra-ui/icons';
+import DeleteBooking, { DeleteHandle } from '../../components/Booking/DeleteBooking';
+import CustomModal from '../../components/Modal/Modal';
+import { useQuery } from 'react-query';
+import { useMutate } from '../../hooks/useMutate';
+import API from '../../utils/api';
+import { useUser } from '@clerk/clerk-react';
 
 export const Bookings = () => {
-  const {
-    isOpen: isOpenCreate,
-    onOpen: onOpenCreate,
-    onClose: onCloseCreate,
-  } = useDisclosure();
-  const {
-    isOpen: isOpenDelete,
-    onOpen: onOpenDelete,
-    onClose: onCloseDelete,
-  } = useDisclosure();
+  const { isOpen: isOpenCreate, onOpen: onOpenCreate, onClose: onCloseCreate } = useDisclosure();
+  const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
-  const [selectedBookingId, setSelectedBookingId] = useState("");
+  const [selectedBookingId, setSelectedBookingId] = useState('');
   const { user } = useUser();
 
   const deleteBookingRef = useRef<DeleteHandle>(null);
@@ -44,17 +34,15 @@ export const Bookings = () => {
     data,
     isLoading: isBookingsLoading,
     refetch: refetchBookings,
-  } = useQuery(["bookings", user?.id], () =>
-    API.bookings.getBookingsOfUser(user?.id as string),
-  );
+  } = useQuery(['bookings', user?.id], () => API.bookings.getBookingsOfUser(user?.id as string));
 
   const { mutate: deleteBooking, isLoading: isDeleteLoading } = useMutate(
     API.bookings.deleteBooking,
     { onSuccess: refetchBookings, onSettled: onCloseDelete },
     {
-      title: "Booking deleted.",
-      description: "Booking deleted successfully",
-      status: "info",
+      title: 'Booking deleted.',
+      description: 'Booking deleted successfully',
+      status: 'info',
     },
     { title: "Couldn't delete booking" },
   );
@@ -65,15 +53,15 @@ export const Bookings = () => {
     const { description, classroomId, day, time } = data;
     //TODO: convert time to number in bookingform
     const from = dayjs(day)
-      .add(Number(time) - 1, "hours")
+      .add(Number(time) - 1, 'hours')
       .toDate();
-    const to = dayjs(day).add(Number(time), "hours").toDate();
+    const to = dayjs(day).add(Number(time), 'hours').toDate();
 
     const bookingData = {
       from,
       to,
       classroomId,
-      description: description || "",
+      description: description || '',
     };
 
     // createBooking(bookingData);
@@ -83,7 +71,7 @@ export const Bookings = () => {
     deleteBooking(id);
   };
 
-  const bg = useColorModeValue("gray.200", "gray.600");
+  const bg = useColorModeValue('gray.200', 'gray.600');
 
   return (
     <>
@@ -97,19 +85,15 @@ export const Bookings = () => {
             <Card bg={bg} key={b.id} size="sm">
               <CardBody>
                 <Heading size="xs" fontSize="md">
-                  <Link
-                    href={`/classrooms/${b.classroomId}?date=${b.from}`}
-                    style={{ flexGrow: 1 }}
-                  >
+                  <Link href={`/classrooms/${b.classroomId}?date=${b.from}`} style={{ flexGrow: 1 }}>
                     {b.classroom.name}
                   </Link>
                 </Heading>
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex gap="10px">
                     <Text fontSize="xs">
-                      {" "}
-                      {dayjs(b.from).format("YYYY/MM/DD HH:00")} -{" "}
-                      {dayjs(b.to).format("HH:00")} {b.booker.username}
+                      {' '}
+                      {dayjs(b.from).format('YYYY/MM/DD HH:00')} - {dayjs(b.to).format('HH:00')} {b.booker.username}
                     </Text>
                     <Text fontSize="xs"> {b.description}</Text>
                   </Flex>
@@ -121,7 +105,7 @@ export const Bookings = () => {
                     w={6}
                     h={6}
                     color="red.500"
-                    _hover={{ color: "red.800", cursor: "pointer" }}
+                    _hover={{ color: 'red.800', cursor: 'pointer' }}
                   />
                 </Flex>
               </CardBody>
@@ -138,16 +122,12 @@ export const Bookings = () => {
         isOpen={isOpenDelete}
         onOpen={onOpenDelete}
         onClose={() => {
-          setSelectedBookingId("");
+          setSelectedBookingId('');
           onCloseDelete();
         }}
         onSubmit={() => deleteBookingRef.current?._delete()}
       >
-        <DeleteBooking
-          onDelete={onDelete}
-          bookingId={selectedBookingId}
-          ref={deleteBookingRef}
-        />
+        <DeleteBooking onDelete={onDelete} bookingId={selectedBookingId} ref={deleteBookingRef} />
       </CustomModal>
     </>
   );

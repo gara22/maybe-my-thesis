@@ -1,4 +1,4 @@
-import { UserResource } from "@clerk/types";
+import { UserResource } from '@clerk/types';
 
 /**
  * Model Account
@@ -69,8 +69,8 @@ export type Booking = {
 };
 
 export type BookingWithAllData = {
-  booker: Pick<UserResource, "username">;
+  booker: Pick<UserResource, 'username'>;
   classroom: Classroom;
 } & Booking;
 
-export type BookingWithBooker = Omit<BookingWithAllData, "classroom">;
+export type BookingWithBooker = Omit<BookingWithAllData, 'classroom'>;

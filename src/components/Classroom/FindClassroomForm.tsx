@@ -1,20 +1,11 @@
-import React from "react";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React from 'react';
+import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Select,
-  Stack,
-  Switch,
-} from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
-import { TIME_INTERVALS } from "../../utils/constants";
-import dayjs from "dayjs";
+import { Button, FormControl, FormErrorMessage, FormLabel, Input, Select, Stack, Switch } from '@chakra-ui/react';
+import { useForm } from 'react-hook-form';
+import { TIME_INTERVALS } from '../../utils/constants';
+import dayjs from 'dayjs';
 
 const schema = z.object({
   // classroomId: z.string().min(1, {
@@ -22,7 +13,7 @@ const schema = z.object({
   // }),
   day: z.coerce.date(),
   time: z.coerce.number().min(1, {
-    message: "Must choose time!",
+    message: 'Must choose time!',
   }),
   hasComputer: z.boolean(),
 });
@@ -39,9 +30,9 @@ export const FindClassroomForm = ({ onSubmit }: FindClassroomFormProps) => {
     getValues,
   } = useForm<{ day: Date; time: number; hasComputer: boolean }>({
     resolver: zodResolver(schema),
-    mode: "onTouched",
+    mode: 'onTouched',
     defaultValues: {
-      day: dayjs(new Date()).format("YYYY-MM-DD").toString() as unknown as Date,
+      day: dayjs(new Date()).format('YYYY-MM-DD').toString() as unknown as Date,
       time: 8,
     },
   });
@@ -51,17 +42,12 @@ export const FindClassroomForm = ({ onSubmit }: FindClassroomFormProps) => {
       <Stack spacing={6}>
         <FormControl id="day" isInvalid={!!errors.day}>
           <FormLabel>day</FormLabel>
-          <Input
-            placeholder="Select Date and Time"
-            size="md"
-            type="date"
-            {...register("day")}
-          />
+          <Input placeholder="Select Date and Time" size="md" type="date" {...register('day')} />
           <FormErrorMessage>{errors.day?.message}</FormErrorMessage>
         </FormControl>
         <FormControl id="time" isInvalid={!!errors.time}>
           <FormLabel>time</FormLabel>
-          <Select placeholder="Select option" {...register("time")}>
+          <Select placeholder="Select option" {...register('time')}>
             {TIME_INTERVALS.map(({ view, time }) => (
               <option key={time} value={time}>
                 {view}
@@ -72,7 +58,7 @@ export const FindClassroomForm = ({ onSubmit }: FindClassroomFormProps) => {
         </FormControl>
         <FormControl id="hasComputer">
           <FormLabel>Has computers?</FormLabel>
-          <Switch id="hasComputer" {...register("hasComputer")} />
+          <Switch id="hasComputer" {...register('hasComputer')} />
         </FormControl>
         <Button type="submit">search</Button>
       </Stack>
@@ -80,6 +66,6 @@ export const FindClassroomForm = ({ onSubmit }: FindClassroomFormProps) => {
   );
 };
 
-FindClassroomForm.displayName = "FindClassroomForm";
+FindClassroomForm.displayName = 'FindClassroomForm';
 
 export default FindClassroomForm;

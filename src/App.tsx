@@ -1,10 +1,10 @@
-import Topbar from "./components/Topbar/Topbar";
+import Topbar from './components/Topbar/Topbar';
 
-import { Outlet } from "react-router-dom";
-import "./index.css";
-import { Page } from "./components/Page/Page";
-import { SignedIn, SignedOut, useClerk } from "@clerk/clerk-react";
-import { Button } from "@chakra-ui/react";
+import { Outlet } from 'react-router-dom';
+import './index.css';
+import { Page } from './components/Page/Page';
+import { SignedIn, SignedOut, useClerk } from '@clerk/clerk-react';
+import { Button } from '@chakra-ui/react';
 
 function App() {
   const { redirectToSignIn } = useClerk();
